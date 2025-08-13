@@ -1,4 +1,3 @@
-// components/room-creation-form.tsx
 'use client'
 
 import { useState } from 'react'

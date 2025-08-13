@@ -102,7 +102,7 @@ int main() {
 
   return(
     <div>
-      <div className="p-4">
+      {/* <div className="p-4"> */}
       {/* <Editor
         value={code}
         onChange={setCode}
@@ -111,8 +111,34 @@ int main() {
       /> */}
       {/* <InputOutputPanel/> */}
       {/* <RoomCreationForm/> */}
-      <RoomJoiningForm/>
+      {/* <RoomJoiningForm/>
 
+    </div> */}
+
+
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-4 sm:p-24">
+      <div className="text-center max-w-2xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+          Collaborative Code Editor
+        </h1>
+        <p className="text-lg text-muted-foreground mb-8">
+          Welcome to the real-time code editing platform
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
+          <a
+            href="/join"
+            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Join Room
+          </a>
+          <a
+            href="/create"
+            className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          >
+            Create Room
+          </a>
+        </div>
+      </div>
     </div>
     </div>
   )
