@@ -67,3 +67,42 @@ export async function GET(request: NextRequest) { //get existing room details
     )
   }
 }
+
+export async function PATCH(request: NextRequest) { //update ie add nd remove users
+  try {
+    const { roomId, action, user } = await request.json()
+
+    if (!roomId || !action || !user) {
+      return NextResponse.json(
+        { error: 'Room ID, action, and user are required' },
+        { status: 400 }
+      )
+    }
+
+    const room = rooms.get(roomId.toUpperCase())
+
+    if (!room) {
+      return NextResponse.json(
+        { error: 'Room not found' },
+        { status: 404 }
+      )
+    }
+
+    if (action === 'add-user') {
+      if (!room.users.find((u: any) => u.id === user.id)) {
+        room.users.push(user)
+      }
+    } else if (action === 'remove-user') {
+      room.users = room.users.filter((u: any) => u.id !== user.id)
+    }
+
+    rooms.set(roomId.toUpperCase(), room)
+    return NextResponse.json({ room })
+  } catch (error) {
+    console.error('Update room users error:', error)
+    return NextResponse.json(
+      { error: 'Failed to update room users' },
+      { status: 500 }
+    )
+  }
+}
