@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-
+import { generateRoomId } from '@/lib/utils'
 const rooms = new Map()
 
 export async function POST(request: NextRequest) { // new room creation
   try {
-    const { userId, userName, userColor } = await request.json()
+    const { userId, userName, userColor, roomIdOverride } = await request.json()
 
     if (!userId || !userName) {
       return NextResponse.json(
@@ -13,7 +13,8 @@ export async function POST(request: NextRequest) { // new room creation
       )
     }
 
-    const roomId = Math.random().toString(36).substring(2, 8).toUpperCase()
+   const roomId = (roomIdOverride || generateRoomId()).toUpperCase()
+
     const room = {
       id: roomId,
       users: [{ id: userId, name: userName, color: userColor }],
@@ -49,7 +50,16 @@ export async function GET(request: NextRequest) { //get existing room details
       )
     }
 
-    const room = rooms.get(roomId.toUpperCase())
+    const normalizedRoomId = roomId.toUpperCase()
+
+    let room = null
+    const roomEntries = Array.from(rooms.entries())
+    for (const [id, roomData] of roomEntries) {
+      if (id.toUpperCase() === normalizedRoomId){
+        room = roomData
+        break
+      }
+    }
 
     if (!room) {
       return NextResponse.json(
@@ -68,6 +78,42 @@ export async function GET(request: NextRequest) { //get existing room details
   }
 }
 
+export async function PUT(req: NextRequest){ //update
+   try {
+     const { roomId, ...updates } = await req.json()
+
+     if(!roomId){
+       return NextResponse.json({error:"Room ID is required"}, {status:400})
+     }
+
+     const normId = roomId.toUpperCase()
+     
+     let foundRoom=null
+     let foundKey=null
+     const entries = Array.from(rooms.entries())
+     for(const [rid, rdata] of entries){
+        if(rid.toUpperCase()===normId){
+            foundRoom=rdata
+            foundKey=rid
+            break
+        }
+     }
+
+     if(!foundRoom){
+       return NextResponse.json({error:"Room not found"}, {status:404})
+     }
+
+     Object.assign(foundRoom, updates)
+     rooms.set(foundKey, foundRoom)
+
+     return NextResponse.json({room:foundRoom})
+   } catch(err){
+     console.error("err updating room", err)
+     return NextResponse.json({error:"Failed to update room"}, {status:500})
+   }
+}
+
+
 export async function PATCH(request: NextRequest) { //update ie add nd remove users
   try {
     const { roomId, action, user } = await request.json()
@@ -79,7 +125,16 @@ export async function PATCH(request: NextRequest) { //update ie add nd remove us
       )
     }
 
-    const room = rooms.get(roomId.toUpperCase())
+
+   const normalizedRoomId = roomId.toUpperCase()
+   let room = null
+     const roomEntries = Array.from(rooms.entries())
+for (const [id, roomData] of roomEntries) {
+  if (id.toUpperCase() === normalizedRoomId) {
+    room = roomData
+    break
+  }
+}
 
     if (!room) {
       return NextResponse.json(
