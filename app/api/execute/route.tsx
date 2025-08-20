@@ -1,29 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { executeCode, SupportedLanguage, LANGUAGE_IDS } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
-    try {
-        const { code, language, input } = await request.json()
+  try {
+    const { sourceCode, language, stdin } = await request.json()
 
-        if (!code || !language) {
-            return NextResponse.json(
-                { error: 'Code and language are required' },
-                { status: 400 }
-            )
-        }
-
-        const tempOutput = `Output for ${language}:
-${code}
-
-Input: ${input || 'No input provided'}
-
-Execution completed successfully!`
-
-        return NextResponse.json({ output: tempOutput })
-    } catch (error) {
-        console.error('Code execution error:', error)
-        return NextResponse.json(
-            { error: 'Failed to execute code' },
-            { status: 500 }
-        )
+    if (!sourceCode || !language) {
+      return NextResponse.json(
+        { error: 'Source code and language are required' },
+        { status: 400 }
+      )
     }
-}
+
+    if (!Object.keys(LANGUAGE_IDS).includes(language)) {
+      return NextResponse.json(
+        { error: 'Unsupported language' },
+        { status: 400 }
+      )
+    }
+
+    const result = await executeCode(
+      sourceCode,
+      language as SupportedLanguage,
+      stdin || ''
+    )
+
+    return NextResponse.json(result)
+  } catch (error) {
+    console.error('Code execution error:', error)
+    return NextResponse.json(
+      { error: 'Failed to execute code' },
+      { status: 500 }
+    )
+  }
+} 
