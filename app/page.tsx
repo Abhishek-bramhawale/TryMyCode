@@ -6,6 +6,7 @@ import { useState } from 'react'
 // import InputOutputPanel from '@/components/ip-op-panel'
 // import RoomCreationForm from '@/components/room-creation-form'
 import RoomJoiningForm from '@/components/room-joining-form'
+import JoinPage from './join/page'
 
 
 export default function Home() {
@@ -124,7 +125,7 @@ int main() {
         <p className="text-lg text-muted-foreground mb-8">
           Welcome to the real-time code editing platform
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
           <a
             href="/join"
             className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -137,7 +138,10 @@ int main() {
           >
             Create Room
           </a>
-        </div>
+        </div> */}
+
+          <JoinPage/>
+        
       </div>
     </div>
     </div>
