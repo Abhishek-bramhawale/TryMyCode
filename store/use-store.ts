@@ -31,6 +31,7 @@ interface AppState {
   updateRoomCode: (code: string) => void
   updateRoomLanguage: (language: string) => void
   updateRoomInput: (input: string) => void
+ 
   updateRoomOutput: (output: string) => void
   setRoomRunning: (isRunning: boolean) => void
   addUserToRoom: (user: User) => void
@@ -41,6 +42,9 @@ interface AppState {
   setIsConnected: (connected: boolean) => void
   theme: 'light' | 'dark' | 'system'
   setTheme: (theme: 'light' | 'dark' | 'system') => void
+  hasHydrated: boolean            // <-- added
+  setHydrated: () => void 
+   
 }
 
 export const useStore = create<AppState>()(
@@ -97,7 +101,11 @@ export const useStore = create<AppState>()(
       setIsConnected: (isConnected) => set({ isConnected }),
       theme: 'system',
       setTheme: (theme) => set({ theme }),
+
+      hasHydrated: false,
+      setHydrated: () => set({ hasHydrated: true })
     }),
+    
     {
       name: 'code-editor-storage',
       partialize: (state) => ({
