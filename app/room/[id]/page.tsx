@@ -1,11 +1,20 @@
 "use client"
 
-import {useEffect,useState} from "react"
-import {useParams,useRouter} from "next/navigation"
-import {useStore} from "@/store/use-store"
-import {copyToClipboard} from "@/lib/utils"
-import {Button} from "@/components/ui/button"
-import {Code,Users} from "lucide-react"
+
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
+import { useStore } from "@/store/use-store"
+import { PROGRAMMING_LANGUAGES, DEFAULT_CODE_SAMPLES } from "@/lib/constants"
+import { copyToClipboard } from "@/lib/utils"
+import Header from "@/components/header"
+import CodeEditor from "@/components/CodeEditor"
+import UserList  from "@/components/user-list"
+import LanguageSelector from "@/components/language-selector"
+import RunCodeButton from "@/components/run-code-btn"
+import InputOutputPanel  from "@/components/ip-op-panel"
+// import { VoiceControls } from "@/components/voice-controls"
+import { Button } from "@/components/ui/button"
+import { Copy, Users, Code, Play } from "lucide-react"
 import toast from "react-hot-toast"
 
 export default function RoomPage(){
@@ -27,7 +36,7 @@ const [error, setError] = useState<string | null>(null)
         const res=await fetch(`/api/rooms?id=${roomId}`)
         if(res.ok){
           const {room}=await res.json()
-          const uInRoom=room.users.find(u=>u.id===user.id)
+          const uInRoom=room.users.find(user.id)
           if(!uInRoom){
             const patch=await fetch("/api/rooms",{
               method:"PATCH",
@@ -102,4 +111,58 @@ const [error, setError] = useState<string | null>(null)
       </div>
     </div>
   }
+
+    if(!user || !currentRoom) return <div className="min-h-screen flex justify-center items-center">
+    <div className="text-center">
+      <div className="animate-spin h-8 w-8 border-b-2 border-primary rounded-full mx-auto mb-4"></div>
+      <p>Loading...</p>
+    </div>
+  </div>
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+
+      <div className="flex h-[calc(100vh-4rem)]">
+        <div className="flex-1 flex flex-col">
+          <div className="border-b bg-card p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${currentRoom.users.length>0?"bg-green-500":"bg-red-500"}`}/>
+                  <span className="text-sm text-muted">Room: {params.id}</span>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleCopy} className="flex items-center space-x-2">
+                  <Copy className="h-4 w-4"/> <span>Copy Link</span>
+                </Button>
+              </div>
+              <div className="flex items-center space-x-4">
+                {/* <VoiceControls/> */}
+                <LanguageSelector/>
+                <RunCodeButton/>
+              </div>
+            </div>
+          </div>
+
+            <div className="flex-1">
+            <CodeEditor value={""} onChange={function (value: string): void {
+              throw new Error("Function not implemented.")
+            } } language={""} />
+          </div>
+
+          <div className="h-64 border-t"><InputOutputPanel/></div>
+        </div>
+
+        <div className="w-80 border-l bg-card">
+          <div className="p-4 border-b">
+            <h3 className="font-semibold flex items-center">
+              <Users className="mr-2 h-4 w-4"/> Active Users ({currentRoom.users.length})
+            </h3>
+          </div>
+          <UserList users={[]}/>
+        </div>
+      </div>
+    </div>
+  )
 }
+
