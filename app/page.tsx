@@ -1,149 +1,127 @@
 'use client'
 
-import { useState } from 'react'
-// import CodeEditor from '@/components/CodeEditor'
-// import Editor from '@/components/CodeEditor'
-// import InputOutputPanel from '@/components/ip-op-panel'
-// import RoomCreationForm from '@/components/room-creation-form'
-import RoomJoiningForm from '@/components/room-joining-form'
-import JoinPage from './join/page'
+import { useState , useEffect} from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { useStore } from "@/store/use-store"
+import { generateUserId, copyToClipboard } from "@/lib/utils"
+import { USER_COLORS } from "@/lib/constants"
+import { Code, Users, Copy, ArrowRight } from "lucide-react"
+import toast from "react-hot-toast"
+import Header from "@/components/header"
 
 
 export default function Home() {
-  const [code, setCode] = useState(`#include <iostream>
-using namespace std;
+  const [username, setUsername] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const router = useRouter();
+  const { user, setUser, setCurrentRoom } = useStore();
 
-int main() {
-    cout << "Hello, World!" << endl;
-    return 0;
-}`)
-  const [language, setLanguage] = useState('54') 
-  const [output, setOutput] = useState('')
-  const [loading, setLoading] = useState(false)
+    useEffect(()=>{
+    if (user){
+      setUsername(user.name)
+    }
+  }, [user])
 
-  const handleSubmit = async () => {
-    setLoading(true)
-    const res = await fetch('/api/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, language }),
-    })
-    const data = await res.json()
-    setOutput(data.output || 'No output')
-    setLoading(false)
-  }
+  const handleCreateRoom =async() =>{
+    if (!username.trim()) {
+      toast.error("Please enter your name")
+      return
+    }
 
-  const getLanguageName = (languageId: string) => {
-    switch (languageId) {
-      case '54': return 'C++'
-      case '62': return 'Java'
-      case '71': return 'Python'
-      case '63': return 'JavaScript'
-      default: return 'Unknown'
+    setIsCreating(true)
+
+
+
+ try {
+      if (!user) {
+        const randomColor = USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
+        const newUser = {
+          id: generateUserId(),
+          name: username.trim(),
+          color: randomColor.code,
+        }
+        setUser(newUser)
+      }
+const response = await fetch('/api/rooms',{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          userId: user?.id || generateUserId(),
+          userName: username.trim(),
+          userColor: user?.color ||USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
+        })
+      })
+}catch (error){
+      console.error('Create room error:', error)
+      toast.error("Failed to create room")
+    } finally{
+      setIsCreating(false)
     }
   }
 
-  // return (
-  //   <main className="min-h-screen bg-gray-900 text-white">
-  //     <div className="container mx-auto p-6">
-  //       <h1 className="text-3xl font-bold mb-6 text-center">Judge0 Code Runner</h1>
-        
-  //       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-  //         <div className="space-y-4">
-  //           <div className="flex items-center justify-between">
-  //             <h2 className="text-xl font-semibold">Code Editor</h2>
-  //             <select
-  //               className="bg-gray-800 border border-gray-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-  //               value={language}
-  //               onChange={(e) => setLanguage(e.target.value)}
-  //             >
-  //               <option value="54">C++</option>
-  //               <option value="62">Java</option>
-  //               <option value="71">Python</option>
-  //               <option value="63">JavaScript</option>
-  //             </select>
-  //           </div>
+
+return (
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <div className="flex justify-center mb-6">
+              <div className="p-4 bg-primary/10 rounded-full">
+                <Code className="h-12 w-12 text-primary" />
+              </div>
+            </div>
+            <h1 className="text-4xl font-bold mb-4">
+              Welcome to{" "}
+              <span className="text-primary">TryMyCode</span>
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8">
+              Realtime collaborative code editing with live compilation and interpretation
+            </p>
+          </div>
+
+          <div className="bg-card border rounded-lg p-8 mb-8">
+            <h2 className="text-2xl font-semibold mb-6">Get Started</h2>
             
-  //           <div className="border border-gray-600 rounded-lg overflow-hidden">
-  //             <CodeEditor
-  //               value={code}
-  //               onChange={setCode}
-  //               language={language}
-  //               height="500px"
-  //             />
-  //           </div>
-            
-  //           <button
-  //             className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-  //             onClick={handleSubmit}
-  //             disabled={loading}
-  //           >
-  //             {loading ? 'Running...' : `Run ${getLanguageName(language)} Code`}
-  //           </button>
-  //         </div>
+            <div className="space-y-4 mb-6">
+              <Input
+                placeholder="Enter your name"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="text-center text-lg"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleCreateRoom()
+                  }
+                }}
+              />
+            </div>
 
-  //         <div className="space-y-4">
-  //           <h2 className="text-xl font-semibold">Output</h2>
-  //           <div className="bg-gray-800 border border-gray-600 rounded-lg p-4 min-h-[500px]">
-  //             {output ? (
-  //               <pre className="text-sm font-mono whitespace-pre-wrap overflow-auto max-h-full">
-  //                 {output}
-  //               </pre>
-  //             ) : (
-  //               <div className="text-gray-400 text-center mt-20">
-  //                 Run your code to see the output here
-  //               </div>
-  //             )}
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </main>
-  // )
-
-  return(
-    <div>
-      {/* <div className="p-4"> */}
-      {/* <Editor
-        value={code}
-        onChange={setCode}
-        language="71" // Python
-        height="500px"
-      /> */}
-      {/* <InputOutputPanel/> */}
-      {/* <RoomCreationForm/> */}
-      {/* <RoomJoiningForm/>
-
-    </div> */}
-
-
-    <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-4 sm:p-24">
-      <div className="text-center max-w-2xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-          Collaborative Code Editor
-        </h1>
-        <p className="text-lg text-muted-foreground mb-8">
-          Welcome to the real-time code editing platform
-        </p>
-        {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
-          <a
-            href="/join"
-            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Join Room
-          </a>
-          <a
-            href="/create"
-            className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-          >
-            Create Room
-          </a>
-        </div> */}
-
-          <JoinPage/>
-        
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                onClick={handleCreateRoom}
+                disabled={isCreating}
+                className="flex-1 h-12 text-lg"
+              >
+                <Code className="mr-2 h-5 w-5" />
+                Create New Room
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="flex-1 h-12 text-lg"
+              >
+                <Users className="mr-2 h-5 w-5" />
+                Join Existing Room
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    </div>
   )
-}
+} 
+
+
