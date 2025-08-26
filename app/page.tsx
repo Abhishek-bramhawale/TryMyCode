@@ -52,13 +52,42 @@ const response = await fetch('/api/rooms',{
           userName: username.trim(),
           userColor: user?.color ||USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
         })
+
+      
       })
+        const { room } = await response.json()
+      setCurrentRoom(room)
+
+      router.push(`/room/${room.id}`)
 }catch (error){
       console.error('Create room error:', error)
       toast.error("Failed to create room")
     } finally{
       setIsCreating(false)
     }
+  }
+
+  const handleJoinRoom = () => {
+    if (!username.trim()) {
+      toast.error("Please enter your name")
+      return
+    }
+
+    if (!user) {
+      const randomColor = USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
+      const newUser = {
+        id: generateUserId(),
+        name: username.trim(),
+        color: randomColor.code,
+      }
+      setUser(newUser)
+    } else if (user.name !== username.trim()) {
+      // Update user name if changed
+      const updatedUser = { ...user, name: username.trim() }
+      setUser(updatedUser)
+    }
+
+    router.push("/join")
   }
 
 
