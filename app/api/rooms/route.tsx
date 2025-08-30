@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateRoomId } from '@/lib/utils'
+import { DEFAULT_CODE_SAMPLES } from '@/lib/constants'
+
 const rooms = new Map()
 
 export async function POST(request: NextRequest) { // new room creation
@@ -18,7 +20,7 @@ export async function POST(request: NextRequest) { // new room creation
     const room = {
       id: roomId,
       users: [{ id: userId, name: userName, color: userColor }],
-      code: '',
+      code: DEFAULT_CODE_SAMPLES.javascript,
       language: 'javascript',
       input: '',
       output: '',

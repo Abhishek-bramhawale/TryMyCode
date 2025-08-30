@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation"
 import { useStore } from "@/store/use-store"
 import { PROGRAMMING_LANGUAGES, DEFAULT_CODE_SAMPLES } from "@/lib/constants"
 import { copyToClipboard } from "@/lib/utils"
-import Header from "@/components/header"
 import CodeEditor from "@/components/CodeEditor"
 import UserList  from "@/components/user-list"
 import LanguageSelector from "@/components/language-selector"
@@ -20,7 +19,7 @@ import toast from "react-hot-toast"
 export default function RoomPage(){
   const params=useParams()
   const router=useRouter()
-  const {user,currentRoom,setCurrentRoom,hasHydrated}=useStore()
+  const {user,currentRoom,setCurrentRoom,hasHydrated,updateRoomCode,updateRoomLanguage}=useStore()
   const [loading,setLoading]=useState(false)
 const [error, setError] = useState<string | null>(null)
   const [retry,setRetry]=useState(0)
@@ -79,6 +78,14 @@ const [error, setError] = useState<string | null>(null)
     initRoom()
   },[user,params.id,router,setCurrentRoom,hasHydrated,retry])
 
+  useEffect(() => {
+    if(currentRoom && (!currentRoom.code || currentRoom.code.trim() === '')) {
+      const defaultLanguage = currentRoom.language || 'javascript'
+      const defaultCode =DEFAULT_CODE_SAMPLES[defaultLanguage as keyof typeof DEFAULT_CODE_SAMPLES] || DEFAULT_CODE_SAMPLES.javascript
+      updateRoomCode(defaultCode)
+    }
+  },[currentRoom, updateRoomCode])
+
   const handleCopy=async()=>{
     try{
       await copyToClipboard(String(params.id))
@@ -120,10 +127,8 @@ const [error, setError] = useState<string | null>(null)
   </div>
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-
-      <div className="flex h-[calc(100vh-4rem)]">
+    <div className="h-[calc(100vh-4rem)]">
+      <div className="flex h-full">
         <div className="flex-1 flex flex-col">
           <div className="border-b bg-card p-4">
             <div className="flex items-center justify-between">
@@ -145,9 +150,10 @@ const [error, setError] = useState<string | null>(null)
           </div>
 
             <div className="flex-1">
-            <CodeEditor value={""} onChange={function (value: string): void {
-              throw new Error("Function not implemented.")
-            } } language={""} />
+            <CodeEditor value={currentRoom.code || ''} 
+              onChange={updateRoomCode} 
+              language={currentRoom.language || 'javascript'} 
+            />
           </div>
 
           <div className="h-64 border-t"><InputOutputPanel/></div>
@@ -159,7 +165,7 @@ const [error, setError] = useState<string | null>(null)
               <Users className="mr-2 h-4 w-4"/> Active Users ({currentRoom.users.length})
             </h3>
           </div>
-          <UserList users={[]}/>
+          <UserList users={currentRoom.users}/>
         </div>
       </div>
     </div>

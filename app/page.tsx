@@ -62,7 +62,7 @@ const response = await fetch('/api/rooms',{
 }catch (error){
       console.error('Create room error:', error)
       toast.error("Failed to create room")
-    } finally{
+    }finally{
       setIsCreating(false)
     }
   }
@@ -93,6 +93,7 @@ const response = await fetch('/api/rooms',{
 
 return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+      <Header />
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto text-center">
           <div className="mb-8">
@@ -141,6 +142,7 @@ return (
               <Button
                 variant="outline"
                 className="flex-1 h-12 text-lg"
+                onClick={handleJoinRoom}
               >
                 <Users className="mr-2 h-5 w-5" />
                 Join Existing Room

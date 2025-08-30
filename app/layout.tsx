@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import "./globals.css";
 import Header from '@/components/header'
 import { ThemeProvider } from '@/components/theme-provider'
+import { HydrationProvider } from '@/components/hydration-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,12 +32,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider>
-          <div className="min-h-screen bg-background">
-            <Header />
-            <main className="container mx-auto py-6">
+          <HydrationProvider>
+            <div className="min-h-screen bg-background">
               {children}
-            </main>
-          </div>
+            </div>
+          </HydrationProvider>
         </ThemeProvider>
       </body>
     </html>
