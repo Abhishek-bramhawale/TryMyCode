@@ -62,7 +62,7 @@ const response = await fetch('/api/rooms',{
 }catch (error){
       console.error('Create room error:', error)
       toast.error("Failed to create room")
-    }finally{
+    } finally{
       setIsCreating(false)
     }
   }
