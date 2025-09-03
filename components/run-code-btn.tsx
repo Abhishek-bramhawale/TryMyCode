@@ -1,40 +1,67 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { Play, Loader2 } from 'lucide-react'
+import { useState} from "react"
+import { Button } from "@/components/ui/button"
+import { useStore } from "@/store/use-store"
+import { Play, Loader2 } from "lucide-react"
+import toast from "react-hot-toast"
 
-interface RunCodeButtonProps {
-  onRun?: () => Promise<void>
-  disabled?: boolean
-}
-
-export default function RunCodeButton({ onRun, disabled = false }: RunCodeButtonProps) {
+export function RunCodeButton(){
+  const { currentRoom, updateRoomOutput, setRoomRunning } = useStore()
   const [isRunning, setIsRunning] = useState(false)
 
-  const handleRun = async () => {
-    if (!onRun || isRunning) return
-    
+  const handleRunCode = async() =>{
+    if (!currentRoom) return
+
     setIsRunning(true)
+    setRoomRunning(true)
+
     try {
-      await onRun()
-    } catch (error) {
-      console.error('Code execution failed:', error)
+      const response = await fetch('/api/execute',{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sourceCode: currentRoom.code,
+          language: currentRoom.language,
+          stdin: currentRoom.input
+        })
+      })
+
+      if (!response.ok){
+        throw new Error('Failed to execute code')
+      }
+
+      const result = await response.json()
+
+      if (result.error){
+        updateRoomOutput(`Error: ${result.error}`)
+        toast.error("Code execution failed")
+      } else {
+        updateRoomOutput(result.output)
+        toast.success("Code executed successfully!")
+      }
+    } catch (error){
+      console.error('Code execution error:', error)
+      updateRoomOutput("Error: Failed to execute code. Please check your code and try again.")
+      toast.error("Failed to execute code")
     } finally {
       setIsRunning(false)
+      setRoomRunning(false)
     }
   }
 
-  return (
-    <button
-      onClick={handleRun}
-      disabled={disabled || isRunning}
-      className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+  return(
+    <Button
+      onClick={handleRunCode}
+      disabled={isRunning || !currentRoom?.code}
+      className="flex items-center space-x-2"
     >
       {isRunning ? (
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
         <Play className="h-4 w-4" />
       )}
-      <span>{isRunning ? 'Running...' : 'Run Code'}</span>
-    </button>
-)}
+      <span>{isRunning ? "Running..." : "Run Code"}</span>
+    </Button>
+  )
+} 

@@ -1,25 +1,73 @@
-'use client'
+"use client"
 
-import Link from 'next/link'
-import { Home, Users, Settings } from 'lucide-react'
+import {Button } from "@/components/ui/button"
+import {useStore } from "@/store/use-store"
+import {Moon, Sun, Code, Users } from "lucide-react"
+import {useTheme } from "next-themes"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
-export default function Header() {
-  return (
+export function Header() {
+  const { theme,setTheme } =useTheme()
+  const{ user} = useStore()
+  const router = useRouter()
+
+  const toggleTheme = ()=>{
+    setTheme(theme ==="light" ? "dark" : "light")
+  }
+
+  return(
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Home className="h-6 w-6" />
-            <span className="font-bold">Code Editor</span>
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link href="/" className="flex items-center space-x-2">
+            <Code className="h-6 w-6" />
+            <span className="font-bold text-xl">TryMyCode</span>
           </Link>
         </div>
-        <nav className="flex items-center space-x-6 text-sm font-medium">
-          <Link href="/join" className="flex items-center space-x-2">
-            <Users className="h-4 w-4" />
-            <span>Join Room</span>
-          </Link>
-        </nav>
+
+        <div className="flex items-center space-x-4">
+          {user && (
+            <div className="flex items-center space-x-2">
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: user.color }}
+              />
+              <span className="text-sm font-medium">{user.name}</span>
+            </div>
+          )}
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="h-9 w-9"
+          >
+            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/")}
+              className="flex items-center space-x-2"
+            >
+              <Code className="h-4 w-4" />
+              <span>Create Room</span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/join")}
+              className="flex items-center space-x-2"
+            >
+              <Users className="h-4 w-4" />
+              <span>Join Room</span>
+            </Button>
+          </div>
+        </div>
       </div>
     </header>
   )
-}
+} 
