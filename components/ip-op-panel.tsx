@@ -1,31 +1,52 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
+import { useStore} from "@/store/use-store"
+import { Textarea } from "./ui/textarea"
+import {Input } from "./ui/input"
+import { emitInputChange } from "@/lib/socket"
 
-interface InputOutputPanelProps {
-  input?: string
-  output?: string
-  onInputChange?: (input: string) => void
-}
+export function InputOutputPanel(){
+  const {currentRoom, updateRoomInput,updateRoomOutput } =useStore()
 
-export default function InputOutputPanel({ input = '', output = '', onInputChange }: InputOutputPanelProps) {
-  return (
-    <div className="grid grid-cols-2 gap-4 h-48">
-      <div className="border rounded-lg p-4">
-        <h3 className="font-semibold mb-2">Input</h3>
-        <textarea
-          value={input}
-          onChange={(e) => onInputChange?.(e.target.value)}
-          className="w-full h-full resize-none bg-background border rounded p-2 text-sm"
-          placeholder="Enter input here..."
-        />
+  const handleInputChange =(value: string) =>{
+    if (currentRoom) {
+      updateRoomInput(value)
+      emitInputChange(currentRoom.id, value)
+    }
+  }
+
+  if(!currentRoom)return null
+
+  return(
+    <div className="h-full flex">
+      <div className="flex-1 border-r">
+        <div className="p-4 border-b">
+          <h3 className="font-semibold text-sm">Input (stdin)</h3>
+        </div>
+        <div className="p-4">
+          <Textarea
+            placeholder="Enter input for your program..."
+            value={currentRoom.input}
+            onChange={(e) => handleInputChange(e.target.value)}
+            className="h-full resize-none font-mono text-sm"
+          />
+        </div>
       </div>
-      <div className="border rounded-lg p-4">
-        <h3 className="font-semibold mb-2">Output</h3>
-        <div className="w-full h-full bg-background border rounded p-2 text-sm overflow-auto">
-          <pre className="whitespace-pre-wrap">{output || 'No output yet...'}</pre>
+
+      <div className="flex-1">
+        <div className="p-4 border-b">
+          <h3 className="font-semibold text-sm">Output (stdout)</h3>
+        </div>
+        <div className="p-4">
+          <Textarea
+            placeholder="Output will appear here..."
+            value={currentRoom.output}
+            onChange={(e) => updateRoomOutput(e.target.value)}
+            className="h-full resize-none font-mono text-sm bg-muted"
+            readOnly
+          />
         </div>
       </div>
     </div>
   )
-}
+} 

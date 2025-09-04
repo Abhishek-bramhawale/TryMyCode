@@ -1,53 +1,37 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
-import{ useStore} from '@/store/use-store'
-import{ PROGRAMMING_LANGUAGES, DEFAULT_CODE_SAMPLES }from '@/lib/constants'
+import { useStore } from "@/store/use-store"
+import { PROGRAMMING_LANGUAGES } from "@/lib/constants"
+import { emitLanguageChange } from "@/lib/socket"
+import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue,} from "@/components/ui/select"
 
-interface LanguageSelectorProps {
-  value?: string
-  onChange?: (language: string) => void
-}
+export function LanguageSelector(){
+  const { currentRoom, updateRoomLanguage } = useStore()
 
-export default function LanguageSelector({ value, onChange }: LanguageSelectorProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const { currentRoom, updateRoomLanguage, updateRoomCode } = useStore()
-  
-  const currentLanguage= value || currentRoom?.language ||'javascript'
-
-  const handleLanguageChange=(language: string) => {
-    updateRoomLanguage(language)
-    
-    const defaultCode = DEFAULT_CODE_SAMPLES[language as keyof typeof DEFAULT_CODE_SAMPLES] || DEFAULT_CODE_SAMPLES.javascript
-    updateRoomCode(defaultCode)
-    
-    onChange?.(language)
-    setIsOpen(false)
+  const handleLanguageChange = (language: string) => {
+    if(currentRoom){
+      updateRoomLanguage(language)
+      emitLanguageChange(currentRoom.id, language)
+    }
   }
 
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 border rounded-md bg-background hover:bg-accent"
-      >
-        <span>{PROGRAMMING_LANGUAGES.find(lang => lang.id === currentLanguage)?.name || 'JavaScript'}</span>
-        <ChevronDown className="h-4 w-4" />
-      </button>
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-full bg-background border rounded-md shadow-lg z-10">
-          {PROGRAMMING_LANGUAGES.map((language) => (
-            <button
-              key={language.id}
-              onClick={()=> handleLanguageChange(language.id)}
-              className="w-full text-left px-3 py-2 hover:bg-accent"
-            >
-              {language.name}
-            </button>
+  if (!currentRoom) return null
+
+  return(
+    <div className="flex items-center space-x-2">
+      <span className="text-sm font-medium">Language:</span>
+      <Select value={currentRoom.language} onValueChange={handleLanguageChange}>
+        <SelectTrigger className="w-40">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {PROGRAMMING_LANGUAGES.map((lang) => (
+            <SelectItem key={lang.id} value={lang.id}>
+              {lang.name}
+            </SelectItem>
           ))}
-        </div>
-      )}
+        </SelectContent>
+      </Select>
     </div>
   )
-}
+} 
