@@ -1,33 +1,49 @@
-'use client'
+"use client"
 
-import { User } from 'lucide-react'
+import {useStore}from "@/store/use-store"
+import { User } from "lucide-react"
 
-interface User {
-  id: string
-  name: string
-  color?: string
-}
+export function UserList(){
+  const { currentRoom, user } = useStore()
 
-interface UserListProps {
-  users: User[]
-}
+  if(!currentRoom) return null
 
-export default function UserList({ users }: UserListProps) {
-  return (
-    <div className="p-4 border rounded-lg">
-      <h3 className="font-semibold mb-3">Connected Users ({users.length})</h3>
-      <div className="space-y-2">
-        {users.map((user) => (
-          <div key={user.id} className="flex items-center space-x-2">
-            <div 
+  return(
+    <div className="p-4">
+      <div className="space-y-3">
+        {currentRoom.users.map((userItem) =>(
+          <div
+            key={userItem.id}
+            className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors"
+          >
+            <div
               className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: user.color || '#3b82f6' }}
+              style={{ backgroundColor: userItem.color}}
             />
-            <User className="h-4 w-4" />
-            <span className="text-sm">{user.name}</span>
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <span className="font-medium text-sm">{userItem.name}</span>
+                {userItem.id === user?.id && (
+                  <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
+                    You
+                  </span>
+                )}
+               
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {userItem.isTyping ? "Typing..." : userItem.isVoiceActive ? "Voice Active" : "Online"}
+              </div>
+            </div>
           </div>
         ))}
       </div>
+
+      {currentRoom.users.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">
+          <User className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">No users online</p>
+        </div>
+      )}
     </div>
   )
-}
+} 

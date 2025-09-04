@@ -9,7 +9,7 @@ import { generateUserId, copyToClipboard } from "@/lib/utils"
 import { USER_COLORS } from "@/lib/constants"
 import { Code, Users, Copy, ArrowRight } from "lucide-react"
 import toast from "react-hot-toast"
-import Header from "@/components/header"
+import {Header} from "@/components/header"
 
 
 export default function Home() {
