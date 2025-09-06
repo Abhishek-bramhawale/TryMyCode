@@ -75,17 +75,5 @@ console.log("Fibonacci of 10:", fibonacci(10));`,
 
 } as const
 
-export const USER_COLORS = [
-  { name: "Red", code: "#FF0000" },
-  { name: "Orange", code: "#FFA500" },
-  { name: "Yellow", code: "#FFFF00" },
-  { name: "Green", code: "#008000" },
-  { name: "Blue", code: "#0000FF" },
-  { name: "Purple", code: "#800080" },
-  { name: "Cyan", code: "#00FFFF" },
-  { name: "Pink", code: "#FFC0CB" },
-  { name: "Brown", code: "#A52A2A" },
-  { name: "Gray", code: "#808080" },
-  { name: "Black", code: "#000000" },
-  { name: "White", code: "#FFFFFF" }
+export const USER_COLORS = ["#FF0000","#FFA500", "#FFFF00","#008000" ,"#0000FF" ,"#800080","#00FFFF" ,"#FFC0CB" , "#A52A2A","#808080","#000000" , "#FFFFFF" 
 ]
