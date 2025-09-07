@@ -40,9 +40,12 @@ export default function Home() {
         const newUser = {
           id: generateUserId(),
           name: username.trim(),
-          color: randomColor.code,
+          color: randomColor,
         }
         setUser(newUser)
+      } else if (user.name !== username.trim()){
+        const updatedUser = { ...user, name: username.trim()}
+        setUser(updatedUser)
       }
 const response = await fetch('/api/rooms',{
         method: 'POST',
@@ -78,7 +81,7 @@ const response = await fetch('/api/rooms',{
       const newUser = {
         id: generateUserId(),
         name: username.trim(),
-        color: randomColor.code,
+        color: randomColor,
       }
       setUser(newUser)
     } else if (user.name !== username.trim()) {
@@ -149,10 +152,46 @@ return (
               </Button>
             </div>
           </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-card border rounded-lg p-6">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-blue-500/10 rounded-full">
+                  <Code className="h-6 w-6 text-blue-500" />
+                </div>
+              </div>
+              <h3 className="font-semibold mb-2">Real time Editing</h3>
+              <p className="text-sm text-muted-foreground">
+                Collaborate with others in realtime with live code synchronization
+              </p>
+            </div>
+
+            <div className="bg-card border rounded-lg p-6">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-green-500/10 rounded-full">
+                  <Code className="h-6 w-6 text-green-500" />
+                </div>
+              </div>
+              <h3 className="font-semibold mb-2">Live Compilation</h3>
+              <p className="text-sm text-muted-foreground">
+                Run your code instantly with support for multiple programming languages
+              </p>
+            </div>
+
+            <div className="bg-card border rounded-lg p-6">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-purple-500/10 rounded-full">
+                  <Users className="h-6 w-6 text-purple-500" />
+                </div>
+              </div>
+              <h3 className="font-semibold mb-2">User Presence</h3>
+              <p className="text-sm text-muted-foreground">
+                See who's online and what they're working on in realtime libe
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   )
 } 
-
-

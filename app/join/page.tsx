@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useStore } from "@/store/use-store"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Users, ArrowRight, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import toast from "react-hot-toast"
-import { generateUserId } from "@/lib/utils"
+import { useStore } from "@/store/use-store"
 import { USER_COLORS } from "@/lib/constants"
+import { generateUserId } from "@/lib/utils"
+import { ArrowLeft, Users, ArrowRight, Loader2 } from "lucide-react"
+import toast from "react-hot-toast"
 import Link from "next/link"
 
-export default function JoinPage() {
+export default function JoinPage(){
   const [roomId, setRoomId] = useState("")
   const [username, setUsername] = useState("")
   const [isJoining, setIsJoining] = useState(false)
@@ -19,22 +19,22 @@ export default function JoinPage() {
   const router = useRouter()
   const { user, setUser, setCurrentRoom, addUserToRoom } = useStore()
 
-  useEffect(() => {
-    if(user){
+  useEffect(() =>{
+    if (user) {
       setUsername(user.name)
-      setShowUsernameInput(false)
-    }else{
-      setShowUsernameInput(true)
+      setShowUsernameInput(false) 
+    } else {
+      setShowUsernameInput(true) 
     }
-  },[user])
+  }, [user])
 
-  const handleJoinRoom = async () => {
-    if(!roomId.trim()) {
+  const handleJoinRoom = async () =>{
+    if (!roomId.trim()) {
       toast.error("Please enter a room ID")
       return
     }
 
-    if(showUsernameInput && !username.trim()){
+    if (showUsernameInput && !username.trim()){
       toast.error("Please enter your name")
       return
     }
@@ -43,78 +43,79 @@ export default function JoinPage() {
 
     try{
       if(!user){
-        const randomColor = USER_COLORS[Math.floor(Math.random()*USER_COLORS.length)].code;
+        const randomColor = USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
         const newUser = {
           id: generateUserId(),
           name: username.trim(),
-          color: randomColor
+          color: randomColor,
         }
         setUser(newUser)
-      } else if(user.name !== username.trim()){
-        const updatedUser = {...user, name: username.trim()}
+      } else if (user.name !== username.trim()){
+        const updatedUser = { ...user, name: username.trim()}
         setUser(updatedUser)
       }
 
       const normalizedRoomId = roomId.trim().toUpperCase()
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000)
 
-      const response = await fetch(`/api/rooms?id=${normalizedRoomId}`, {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) 
+
+      const response = await fetch(`/api/rooms?id=${normalizedRoomId}`,{
         signal: controller.signal
       })
-
+      
       clearTimeout(timeoutId)
-
-      if(!response.ok){
-        if(response.status === 404){
+      
+      if (!response.ok){
+        if (response.status === 404) {
           toast.error("Room not found. Please check the room ID.")
-        }else{
+        } else {
           toast.error("Failed to join room")
         }
         return
       }
 
       const { room } = await response.json()
-
-      const currentUser = user || {
+      
+      const currentUser = user ||{
         id: generateUserId(),
         name: username.trim(),
-        color: USER_COLORS[Math.floor(Math.random()*USER_COLORS.length)]
+        color: USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
       }
-
+      
       room.users = [...room.users, currentUser]
       setCurrentRoom(room)
-
+      
       router.push(`/room/${normalizedRoomId}`)
-    }catch(err){
-      console.error('Join room error:', err)
-      if(err instanceof Error && err.name === 'AbortError'){
+    } catch (error) {
+      console.error('Join room error:', error)
+      if (error instanceof Error && error.name === 'AbortError'){
         toast.error("Request timed out. Please try again.")
-      }else{
+      } else {
         toast.error("Failed to join room")
       }
-    }finally{
+    } finally {
       setIsJoining(false)
     }
   }
 
-  const handleUsernameSubmit = () => {
-    if(!username.trim()){
+  const handleUsernameSubmit = () =>{
+    if (!username.trim()) {
       toast.error("Please enter your name")
       return
     }
-
-    const randomColor = USER_COLORS[Math.floor(Math.random()*USER_COLORS.length)].code;
+    
+    const randomColor = USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
     const newUser = {
       id: generateUserId(),
       name: username.trim(),
-      color: randomColor
+      color: randomColor,
     }
     setUser(newUser)
     setShowUsernameInput(false)
   }
 
-  return (
+  return(
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto">
@@ -123,7 +124,7 @@ export default function JoinPage() {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
             </Link>
-
+            
             <div className="text-center mb-6">
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-primary/10 rounded-full">
@@ -139,38 +140,59 @@ export default function JoinPage() {
 
           <div className="bg-card border rounded-lg p-6">
             <div className="space-y-4">
-              {showUsernameInput ? (
+              {showUsernameInput ?(
                 <div>
-                  <label className="block text-sm font-medium mb-2">Your Name</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Your Name
+                  </label>
                   <Input
                     placeholder="Enter your name"
                     value={username}
-                    onChange={(e)=>setUsername(e.target.value)}
-                    onKeyPress={(e)=>{
-                      if(e.key === "Enter") handleUsernameSubmit()
+                    onChange={(e) => setUsername(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter"){
+                        handleUsernameSubmit()
+                      }
                     }}
                   />
-                  <Button onClick={handleUsernameSubmit} className="w-full mt-2">Continue</Button>
+                  <Button
+                    onClick={handleUsernameSubmit}
+                    className="w-full mt-2"
+                  >
+                    Continue
+                  </Button>
                 </div>
-              ):(
+              ) : (
                 <div>
-                  <label className="block text-sm font-medium mb-2">Your Name</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Your Name
+                  </label>
                   <div className="p-3 bg-muted rounded-md">
                     <span className="text-sm">{username}</span>
                   </div>
-                  <Button variant="outline" onClick={()=>setShowUsernameInput(true)} className="w-full mt-2">Change Name</Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowUsernameInput(true)}
+                    className="w-full mt-2"
+                  >
+                    Change Name
+                  </Button>
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium mb-2">Room ID</label>
+                <label className="block text-sm font-medium mb-2">
+                  Room ID
+                </label>
                 <Input
                   placeholder="Enter room ID (e.g., ABC123)"
                   value={roomId}
-                  onChange={(e)=>setRoomId(e.target.value)}
+                  onChange={(e) => setRoomId(e.target.value)}
                   className="font-mono"
-                  onKeyPress={(e)=>{
-                    if(e.key==="Enter" && !showUsernameInput) handleJoinRoom()
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter" && !showUsernameInput){
+                      handleJoinRoom()
+                    }
                   }}
                 />
               </div>
@@ -182,10 +204,10 @@ export default function JoinPage() {
               >
                 {isJoining ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
                     Joining...
                   </>
-                ):(
+                ) : (
                   <>
                     <Users className="mr-2 h-5 w-5"/>
                     Join Room
@@ -198,7 +220,9 @@ export default function JoinPage() {
             <div className="mt-6 pt-6 border-t">
               <p className="text-sm text-muted-foreground text-center">
                 Don't have a room ID?{" "}
-                <Link href="/" className="text-primary hover:underline">Create a new room</Link>
+                <Link href="/" className="text-primary hover:underline">
+                  Create a new room
+                </Link>
               </p>
             </div>
           </div>
@@ -206,4 +230,4 @@ export default function JoinPage() {
       </div>
     </div>
   )
-}
+} 
