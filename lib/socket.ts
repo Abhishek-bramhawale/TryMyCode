@@ -42,7 +42,7 @@ export function getSocket(): Socket | null {
 export   function disconnectFromRoom( ){
  const socket =getSocket()
  if ( socket){
-   socket. disconnect()
+   socket.disconnect()
  } 
 }
 
