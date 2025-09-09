@@ -42,11 +42,20 @@ app.prepare().then(() =>{
       
       if (!rooms.has(roomId)) {
         rooms.set(roomId, {
+          id: roomId,
           users: [],
-          code: '',
+          code: `console.log("Hello, World!");
+
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+console.log("Fibonacci of 10:", fibonacci(10));`,
           language: 'javascript',
           input: '',
           output: '',
+          isRunning: false,
           createdAt: new Date().toISOString()
         })
       }
@@ -57,36 +66,50 @@ app.prepare().then(() =>{
         room.users.push(user)
       }
       
+      // Notify other users in the room
       socket.to(roomId).emit('user-joined', { user })
       
+      // Send current room state to the joining user
       socket.emit('room-state', room)
       
       console.log(`Room ${roomId} users:`, room.users.map(u => u.name))
     })
 
     socket.on('code-change', ({ roomId, code }) =>{
+      console.log(`Code change in room ${roomId}:`, code.substring(0, 50) + '...')
       if (rooms.has(roomId)) {
-        rooms.get(roomId).code = code
+        const room = rooms.get(roomId)
+        room.code = code
+        // Broadcast to all other users in the room
         socket.to(roomId).emit('code-update', { code })
+        console.log(`Broadcasted code update to ${room.users.length - 1} other users`)
       }
     })
 
     socket.on('language-change', ({ roomId, language }) =>{
-  if (rooms.has(roomId)) {
-    rooms.get(roomId).language = language
-    socket.to(roomId).emit('language-update', { language })
-  }
-})
+      console.log(`Language change in room ${roomId} to ${language}`)
+      if (rooms.has(roomId)) {
+        const room = rooms.get(roomId)
+        room.language = language
+        // Broadcast to all other users in the room
+        socket.to(roomId).emit('language-update', { language })
+        console.log(`Broadcasted language update to ${room.users.length - 1} other users`)
+      }
+    })
 
 
     socket.on('input-change', ({ roomId, input }) =>{
+      console.log(`Input change in room ${roomId}`)
       if (rooms.has(roomId)) {
-        rooms.get(roomId).input = input
+        const room = rooms.get(roomId)
+        room.input = input
+        // Broadcast to all other users in the room
         socket.to(roomId).emit('input-update', { input })
       }
     })
 
     socket.on('user-typing', ({ roomId, userId, isTyping }) =>{
+      // Broadcast typing status to all other users in the room
       socket.to(roomId).emit('user-typing', { userId, isTyping })
     })
 

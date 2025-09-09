@@ -1,17 +1,22 @@
 "use client"
 
 import { useStore } from "@/store/use-store"
-import { PROGRAMMING_LANGUAGES } from "@/lib/constants"
-import { emitLanguageChange } from "@/lib/socket"
+import { PROGRAMMING_LANGUAGES, DEFAULT_CODE_SAMPLES } from "@/lib/constants"
+import { emitLanguageChange, emitCodeChange } from "@/lib/socket"
 import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue,} from "@/components/ui/select"
 
 export function LanguageSelector(){
-  const { currentRoom, updateRoomLanguage } = useStore()
+  const { currentRoom, updateRoomLanguage, updateRoomCode } = useStore()
 
   const handleLanguageChange = (language: string) => {
     if(currentRoom){
       updateRoomLanguage(language)
       emitLanguageChange(currentRoom.id, language)
+      
+      // Update code with default sample for new language
+      const defaultCode = DEFAULT_CODE_SAMPLES[language as keyof typeof DEFAULT_CODE_SAMPLES] || DEFAULT_CODE_SAMPLES.javascript
+      updateRoomCode(defaultCode)
+      emitCodeChange(currentRoom.id, defaultCode)
     }
   }
 

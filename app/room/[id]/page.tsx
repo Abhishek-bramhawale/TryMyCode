@@ -15,11 +15,13 @@ import { Button } from "@/components/ui/button"
 import { Copy, Users, Code, Play } from "lucide-react"
 import toast from "react-hot-toast"
 import { Header } from "@/components/header"
+import { initializeSocket, connectToRoom, disconnectFromRoom } from "@/lib/socket"
+import { WebSocketStatus } from "@/components/websocket-status"
 
 export default function RoomPage(){
   const params = useParams()
   const router = useRouter()
-  const { user, currentRoom, setCurrentRoom, addUserToRoom, hasHydrated } = useStore()
+  const { user, currentRoom, setCurrentRoom, addUserToRoom, hasHydrated, setIsConnected, updateRoomCode, updateRoomLanguage } = useStore()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
@@ -104,6 +106,61 @@ export default function RoomPage(){
 
     initializeRoom()
   }, [user, params.id, router, setCurrentRoom, addUserToRoom, retryCount, hasHydrated])
+
+  useEffect(() => {
+    if (currentRoom && user && hasHydrated) {
+      console.log('Initializing WebSocket connection for room:', currentRoom.id)
+      const socket = initializeSocket()
+      
+      socket.on('connect', () =>{
+        console.log('Connected to WebSocket server')
+        setIsConnected(true)
+        socket.emit('join-room', { roomId: currentRoom.id, user })
+      })
+
+      socket.on('disconnect', () =>{
+        console.log('Disconnected from WebSocket server')
+        setIsConnected(false)
+      })
+
+      socket.on('connect_error', (error) =>{
+        console.error('WebSocket connection error:', error)
+        setIsConnected(false)
+      })
+
+      socket.on('room-state', (roomState) =>{
+        console.log('Received room state:', roomState)
+        setCurrentRoom(roomState)
+      })
+
+      socket.on('user-joined', ({ user: newUser }) =>{
+        console.log('User joined:', newUser)
+        addUserToRoom(newUser)
+      })
+
+      socket.on('user-left', ({ userId }) =>{
+        console.log('User left:', userId)
+      })
+
+      // Add code and language update listeners here too
+      socket.on('code-update', ({ code }) => {
+        console.log('Received code update in room page:', code.substring(0, 50) + '...')
+        updateRoomCode(code)
+      })
+
+      socket.on('language-update', ({ language }) => {
+        console.log('Received language update in room page:', language)
+        updateRoomLanguage(language)
+      })
+
+      socket.connect()
+
+      return () =>{
+        console.log('Cleaning up WebSocket connection')
+        socket.disconnect()
+      }
+    }
+  }, [currentRoom?.id, user, hasHydrated, setIsConnected, setCurrentRoom, addUserToRoom, updateRoomCode, updateRoomLanguage])
 
   const handleCopyRoomLink = async () =>{
     const roomId = String(params.id)
@@ -198,6 +255,7 @@ export default function RoomPage(){
               </div>
 
               <div className="flex items-center space-x-4">
+                <WebSocketStatus />
                 <LanguageSelector />
                 <RunCodeButton />
               </div>

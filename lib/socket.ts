@@ -49,8 +49,12 @@ export   function disconnectFromRoom( ){
 
  export function emitCodeChange(roomId:string ,code:string){
    const socket= getSocket( ) 
+   console.log('emitCodeChange called:', { roomId, codeLength: code.length, socketConnected: socket?.connected })
    if(socket &&socket.connected ){
-   socket.emit('code-change' , {roomId,  code,})
+     console.log('Emitting code-change event')
+     socket.emit('code-change' , {roomId,  code,})
+   } else {
+     console.log('Socket not connected, cannot emit code change')
    }
  }
 
