@@ -135,19 +135,19 @@ return (
               <Button
                 onClick={handleCreateRoom}
                 disabled={isCreating}
-                className="flex-1 h-12 text-lg"
+                className="flex-1 h-12 text-lg group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80"
               >
-                <Code className="mr-2 h-5 w-5" />
+                <Code className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-200" />
                 Create New Room
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
               </Button>
               
               <Button
                 variant="outline"
-                className="flex-1 h-12 text-lg"
+                className="flex-1 h-12 text-lg group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80"
                 onClick={handleJoinRoom}
               >
-                <Users className="mr-2 h-5 w-5" />
+                <Users className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
                 Join Existing Room
               </Button>
             </div>

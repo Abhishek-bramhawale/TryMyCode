@@ -54,14 +54,14 @@ export function RunCodeButton(){
     <Button
       onClick={handleRunCode}
       disabled={isRunning || !currentRoom?.code}
-      className="flex items-center space-x-2"
+      className="flex items-center space-x-2 group hover:bg-gradient-to-r hover:from-green-600 hover:to-green-500 hover:shadow-lg hover:shadow-green-500/25"
     >
       {isRunning ? (
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <Play className="h-4 w-4" />
+        <Play className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
       )}
-      <span>{isRunning ? "Running..." : "Run Code"}</span>
+      <span className="group-hover:translate-x-0.5 transition-transform duration-200">{isRunning ? "Running..." : "Run Code"}</span>
     </Button>
   )
 } 

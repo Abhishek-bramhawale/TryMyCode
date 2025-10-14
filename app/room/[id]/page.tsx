@@ -147,11 +147,11 @@ export default function RoomPage(){
           <h2 className="text-xl font-semibold mb-2">Error</h2>
           <p className="text-muted-foreground mb-4">{error}</p>
           <div className="space-x-2">
-            <Button onClick={handleRetry}>
-              Retry
+            <Button onClick={handleRetry} className="group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80">
+              <span className="group-hover:scale-105 transition-transform duration-200">Retry</span>
             </Button>
-            <Button variant="outline" onClick={() => router.push("/")}>
-              Back to Home
+            <Button variant="outline" onClick={() => router.push("/")} className="group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80">
+              <span className="group-hover:scale-105 transition-transform duration-200">Back to Home</span>
             </Button>
           </div>
         </div>
@@ -190,10 +190,10 @@ export default function RoomPage(){
                   variant="outline"
                   size="sm"
                   onClick={handleCopyRoomLink}
-                  className="flex items-center space-x-2"
+                  className="flex items-center space-x-2 group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80"
                 >
-                  <Copy className="h-4 w-4" />
-                  <span>Copy Link</span>
+                  <Copy className="h-4 w-4 group-hover:rotate-12 transition-transform duration-200" />
+                  <span className="group-hover:scale-105 transition-transform duration-200">Copy Link</span>
                 </Button>
               </div>
 

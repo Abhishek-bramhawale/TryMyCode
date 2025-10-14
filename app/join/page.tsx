@@ -157,9 +157,9 @@ export default function JoinPage(){
                   />
                   <Button
                     onClick={handleUsernameSubmit}
-                    className="w-full mt-2"
+                    className="w-full mt-2 group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80"
                   >
-                    Continue
+                    <span className="group-hover:translate-x-1 transition-transform duration-200">Continue</span>
                   </Button>
                 </div>
               ) : (
@@ -173,9 +173,9 @@ export default function JoinPage(){
                   <Button
                     variant="outline"
                     onClick={() => setShowUsernameInput(true)}
-                    className="w-full mt-2"
+                    className="w-full mt-2 group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80"
                   >
-                    Change Name
+                    <span className="group-hover:scale-105 transition-transform duration-200">Change Name</span>
                   </Button>
                 </div>
               )}
@@ -200,7 +200,7 @@ export default function JoinPage(){
               <Button
                 onClick={handleJoinRoom}
                 disabled={isJoining || !roomId.trim() || showUsernameInput}
-                className="w-full h-12 text-lg"
+                className="w-full h-12 text-lg group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80"
               >
                 {isJoining ? (
                   <>
@@ -209,9 +209,9 @@ export default function JoinPage(){
                   </>
                 ) : (
                   <>
-                    <Users className="mr-2 h-5 w-5"/>
+                    <Users className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-200"/>
                     Join Room
-                    <ArrowRight className="ml-2 h-5 w-5"/>
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200"/>
                   </>
                 )}
               </Button>

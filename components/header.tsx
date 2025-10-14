@@ -41,10 +41,10 @@ export function Header() {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="h-9 w-9"
+            className="h-9 w-9 group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80 hover: transition-all duration-200"
           >
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 group-hover:scale-110" />
+            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 group-hover:scale-110" />
             <span className="sr-only">Toggle theme</span>
           </Button>
 
@@ -52,18 +52,18 @@ export function Header() {
             <Button
               variant="outline"
               onClick={() => router.push("/")}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80"
             >
-              <Code className="h-4 w-4" />
-              <span>Create Room</span>
+              <Code className="h-4 w-4 group-hover: transition-transform duration-200" />
+              <span className="group-hover:scale-105 transition-transform duration-200">Create Room</span>
             </Button>
             <Button
               variant="outline"
               onClick={() => router.push("/join")}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80"
             >
-              <Users className="h-4 w-4" />
-              <span>Join Room</span>
+              <Users className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+              <span className="group-hover:scale-105 transition-transform duration-200">Join Room</span>
             </Button>
           </div>
         </div>
