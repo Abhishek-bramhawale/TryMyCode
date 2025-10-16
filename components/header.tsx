@@ -3,7 +3,7 @@
 import {Button } from "@/components/ui/button"
 import {useStore } from "@/store/use-store"
 import {Moon, Sun, Code, Users } from "lucide-react"
-import {useTheme } from "next-themes"
+import {useTheme } from "@/components/theme-provider"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 

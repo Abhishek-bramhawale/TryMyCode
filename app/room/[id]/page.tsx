@@ -192,7 +192,7 @@ export default function RoomPage(){
                   onClick={handleCopyRoomLink}
                   className="flex items-center space-x-2 group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80"
                 >
-                  <Copy className="h-4 w-4 group-hover:rotate-12 transition-transform duration-200" />
+                  <Copy className="h-4 w-4 group-hover: transition-transform duration-200" />
                   <span className="group-hover:scale-105 transition-transform duration-200">Copy Link</span>
                 </Button>
               </div>

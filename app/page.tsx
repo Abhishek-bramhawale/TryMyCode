@@ -137,7 +137,7 @@ return (
                 disabled={isCreating}
                 className="flex-1 h-12 text-lg group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80"
               >
-                <Code className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-200" />
+                <Code className="mr-2 h-5 w-5 group-hover: transition-transform duration-200" />
                 Create New Room
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
               </Button>
@@ -154,7 +154,7 @@ return (
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-card border rounded-lg p-6">
+            <div className="bg-card border border-gray-200 rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(59,130,246,0.5)] transition-shadow duration-300">
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-blue-500/10 rounded-full">
                   <Code className="h-6 w-6 text-blue-500" />
@@ -166,7 +166,8 @@ return (
               </p>
             </div>
 
-            <div className="bg-card border rounded-lg p-6">
+            <div className="bg-card border border-gray-200 rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(16,185,129,0.5)] transition-shadow duration-300">
+
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-green-500/10 rounded-full">
                   <Code className="h-6 w-6 text-green-500" />
@@ -178,7 +179,8 @@ return (
               </p>
             </div>
 
-            <div className="bg-card border rounded-lg p-6">
+            <div className="bg-card border border-gray-200 rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(168,85,247,0.5)] transition-shadow duration-300">
+
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-purple-500/10 rounded-full">
                   <Users className="h-6 w-6 text-purple-500" />

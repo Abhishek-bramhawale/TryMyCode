@@ -15,6 +15,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('system')
 
   useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem('tmc-theme') as Theme | null
+      if (saved === 'light' || saved === 'dark' || saved === 'system') {
+        setTheme(saved)
+      }
+    } catch (_) {
+       
+        
+    }
+  }, [])
+
+  useEffect(() => {
     const root = window.document.documentElement
     root.classList.remove('light', 'dark')
 
@@ -23,6 +35,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.classList.add(systemTheme)
     } else {
       root.classList.add(theme)
+    }
+
+    try {
+      window.localStorage.setItem('tmc-theme', theme)
+    } catch (_) {
     }
   }, [theme])
 
