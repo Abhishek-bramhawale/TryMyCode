@@ -12,14 +12,14 @@ import {RunCodeButton} from "@/components/run-code-btn"
 import {InputOutputPanel}  from "@/components/ip-op-panel"
 // import { VoiceControls } from "@/components/voice-controls"
 import { Button } from "@/components/ui/button"
-import { Copy, Users, Code, Play } from "lucide-react"
+import { Copy, Users, Code, Play, LogOut } from "lucide-react"
 import toast from "react-hot-toast"
 import { Header } from "@/components/header"
 
 export default function RoomPage(){
   const params = useParams()
   const router = useRouter()
-  const { user, currentRoom, setCurrentRoom, addUserToRoom, hasHydrated } = useStore()
+  const { user, currentRoom, setCurrentRoom, addUserToRoom, leaveRoom, hasHydrated } = useStore()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
@@ -105,6 +105,17 @@ export default function RoomPage(){
     initializeRoom()
   }, [user, params.id, router, setCurrentRoom, addUserToRoom, retryCount, hasHydrated])
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && currentRoom) {
+        handleLeaveRoom()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [currentRoom])
+
   const handleCopyRoomLink = async () =>{
     const roomId = String(params.id)
     try{
@@ -119,6 +130,35 @@ export default function RoomPage(){
     setError(null)
     setRetryCount(0)
     setIsLoading(true)
+  }
+
+  const handleLeaveRoom = async () => {
+    if (!user || !currentRoom) return
+
+    const confirmed = window.confirm("Are you sure you want to leave this room?")
+    if (!confirmed) return
+
+    try {
+      const response = await fetch('/api/rooms', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: currentRoom.id,
+          action: 'remove-user',
+          user: user
+        })
+      })
+
+      if (response.ok) {
+        toast.success("Left room successfully")
+      }
+    } catch (error) {
+      console.error('Leave room error:', error)
+      toast.error("Failed to leave room")
+    } finally {
+      leaveRoom()
+      router.push("/")
+    }
   }
 
   if (isLoading){
@@ -193,13 +233,22 @@ export default function RoomPage(){
                   className="flex items-center space-x-2 group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80"
                 >
                   <Copy className="h-4 w-4 group-hover: transition-transform duration-200" />
-                  <span className="group-hover:scale-105 transition-transform duration-200">Copy Link</span>
+                  <span className="group-hover:scale-105 transition-transform duration-200">Copy Code</span>
                 </Button>
               </div>
 
               <div className="flex items-center space-x-4">
                 <LanguageSelector />
                 <RunCodeButton />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLeaveRoom}
+                  className="flex items-center space-x-2 group hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 hover:text-white transition-all duration-200"
+                >
+                  <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                  <span className="group-hover:scale-105 transition-transform duration-200">Leave Room</span>
+                </Button>
               </div>
             </div>
           </div>

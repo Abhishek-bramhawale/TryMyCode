@@ -13,6 +13,9 @@ export function CodeEditor(){
     updateRoomCode, 
     updateRoomLanguage,
     updateUserTyping,
+    addUserToRoom,
+    removeUserFromRoom,
+    setCurrentRoom,
     isConnected,
     setIsConnected 
   } = useStore()
@@ -20,6 +23,9 @@ export function CodeEditor(){
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const emitDebounceRef = useRef<NodeJS.Timeout | null>(null)
   const socketRef = useRef<any>(null)
+  const isUserTypingRef = useRef<boolean>(false)
+  const lastUserInputRef = useRef<string>('')
+  const lastSyncTimeRef = useRef<number>(0)
 
    useEffect(() =>{
     if (currentRoom && user){
@@ -36,11 +42,25 @@ export function CodeEditor(){
       })
 
       socket.on('code-update', ({ code }) =>{
-        if (editorRef.current){
+        if (editorRef.current && !isUserTypingRef.current){
           const model = editorRef.current.getModel()
           if (model && model.getValue() !== code){
-            model.setValue(code)
-            updateRoomCode(code)
+            const currentValue = model.getValue()
+            const now = Date.now()
+            
+            const timeSinceLastInput = now - lastSyncTimeRef.current
+            
+            const isSignificantChange = 
+              Math.abs(currentValue.length - code.length) > 5 || 
+              currentValue.length < 10 || 
+              timeSinceLastInput > 2000 || 
+              !currentValue.includes(code.substring(0, Math.min(20, Math.min(currentValue.length, code.length))))
+            
+            if (isSignificantChange) {
+              model.setValue(code)
+              updateRoomCode(code)
+              lastSyncTimeRef.current = now
+            }
           }
         }
       })
@@ -51,10 +71,12 @@ export function CodeEditor(){
 
       socket.on('user-joined',({ user: newUser }) =>{
         console.log('User joined:', newUser)
+        addUserToRoom(newUser)
       })
 
       socket.on('user-left', ({ userId }) =>{
         console.log('User left:', userId)
+        removeUserFromRoom(userId)
       })
 
       socket.on('user-typing', ({ userId, isTyping })=>{
@@ -69,6 +91,7 @@ export function CodeEditor(){
         if (roomState.language){
           updateRoomLanguage(roomState.language)
         }
+        setCurrentRoom(roomState)
       })
 
       socket.connect()
@@ -77,6 +100,7 @@ export function CodeEditor(){
         if (socket) {
           socket.disconnect()
         }
+        isUserTypingRef.current = false
       }
     }
   }, [currentRoom?.id, user, setIsConnected, updateRoomCode, updateRoomLanguage, updateUserTyping])
@@ -89,13 +113,25 @@ export function CodeEditor(){
         const sampleCode = DEFAULT_CODE_SAMPLES[currentRoom.language as keyof typeof DEFAULT_CODE_SAMPLES]
         
         if (currentValue === "" || currentValue === DEFAULT_CODE_SAMPLES.javascript) {
+          const position = editorRef.current.getPosition()
           model.setValue(sampleCode)
           updateRoomCode(sampleCode)
           emitCodeChange(currentRoom.id, sampleCode)
+          if (position) {
+            editorRef.current.setPosition(position)
+          }
         }
       }
     }
   }, [currentRoom?.language, updateRoomCode])
+
+  useEffect(() => {
+    if (!currentRoom && socketRef.current) {
+      socketRef.current.disconnect()
+      socketRef.current = null
+      setIsConnected(false)
+    }
+  }, [currentRoom, setIsConnected])
 
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor
@@ -108,6 +144,10 @@ export function CodeEditor(){
 
   const handleEditorChange = useCallback((value: string | undefined) =>{
     if (value !== undefined && currentRoom) {
+      isUserTypingRef.current = true
+      lastUserInputRef.current = value
+      lastSyncTimeRef.current = Date.now()
+      
       updateRoomCode(value)
 
       if (emitDebounceRef.current){
@@ -115,7 +155,10 @@ export function CodeEditor(){
       }
       emitDebounceRef.current = setTimeout(() =>{
         emitCodeChange(currentRoom.id, value)
-      }, 150)
+        setTimeout(() => {
+          isUserTypingRef.current = false
+        }, 200)
+      }, 500)  
 
     if (user) {
         emitUserTyping(currentRoom.id, user.id, true)
@@ -124,7 +167,7 @@ export function CodeEditor(){
         }
         typingTimeoutRef.current = setTimeout(() => {
           emitUserTyping(currentRoom.id, user.id, false)
-        }, 800)
+        }, 1000) 
       }
     }
   }, [currentRoom, user, updateRoomCode])

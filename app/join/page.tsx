@@ -76,14 +76,7 @@ export default function JoinPage(){
       }
 
       const { room } = await response.json()
-      
-      const currentUser = user ||{
-        id: generateUserId(),
-        name: username.trim(),
-        color: USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
-      }
-      
-      room.users = [...room.users, currentUser]
+   
       setCurrentRoom(room)
       
       router.push(`/room/${normalizedRoomId}`)

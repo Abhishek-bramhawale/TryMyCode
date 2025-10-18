@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev:ws": "node server.js",
+    "start:ws": "node server.js"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

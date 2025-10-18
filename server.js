@@ -1,30 +1,20 @@
 const { createServer } = require('http')
 const { Server } = require('socket.io')
-const next = require('next')
-const fs = require('fs')
-const path = require('path')
 
-const dev = process.env.NODE_ENV !== 'production'
-const app = next({ dev })
-const handle = app.getRequestHandler()
 
 const rooms = new Map()
 const userSockets = new Map()
 
-const nextDir = path.join(__dirname, '.next')
-if (!fs.existsSync(nextDir)) {
-  fs.mkdirSync(nextDir, { recursive: true })
-}
-
-app.prepare().then(() =>{
-  const server = createServer((req, res) =>{
-    handle(req, res)
+;(async () => {
+  const server = createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' })
+    res.end('ws-ok')
   })
 
-  const io = new Server(server,{
+  const io = new Server(server, {
     cors: {
-      origin: process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000",
-      methods: ["GET", "POST"]
+      origin: process.env.NEXT_PUBLIC_CLIENT_ORIGIN || 'http://localhost:3000',
+      methods: ['GET', 'POST']
     }
   })
 
@@ -111,8 +101,7 @@ app.prepare().then(() =>{
 
   const port = process.env.PORT || 3001
   server.listen(port, () => {
-    console.log(`> Ready on http://localhost:${port}`)
-    console.log(`> WebSocket server running on port ${port}`)
+    console.log(`> WebSocket server running on http://localhost:${port}`)
   })
 
   server.on('error', (error) => {
@@ -126,7 +115,7 @@ app.prepare().then(() =>{
   process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason)
   })
-}).catch((error) => {
-  console.error('Failed to prepare Next.js app:', error)
+})().catch((error) => {
+  console.error('Failed to start WebSocket server:', error)
   process.exit(1)
-}) 
+})

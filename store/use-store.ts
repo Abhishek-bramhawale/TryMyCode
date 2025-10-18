@@ -38,6 +38,7 @@ interface AppState {
   removeUserFromRoom: (userId: string) => void
   updateUserTyping: (userId: string, isTyping: boolean) => void
   updateUserVoiceState: (userId: string, voiceState: Partial<User>) => void
+  leaveRoom: () => void
   isConnected: boolean
   setIsConnected: (connected: boolean) => void
   theme: 'light' | 'dark' | 'system'
@@ -96,6 +97,10 @@ export const useStore = create<AppState>()(
             u.id === userId ? { ...u, ...voiceState } : u
           )
         } : null
+      })),
+      leaveRoom: () => set((state) => ({
+        currentRoom: null,
+        isConnected: false
       })),
       isConnected: false,
       setIsConnected: (isConnected) => set({ isConnected }),
