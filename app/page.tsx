@@ -123,8 +123,9 @@ return (
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="text-center text-lg"
+                disabled={isCreating}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === "Enter" && !isCreating) {
                     handleCreateRoom()
                   }
                 }}
@@ -134,12 +135,21 @@ return (
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 onClick={handleCreateRoom}
-                disabled={isCreating}
-                className="flex-1 h-12 text-lg group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80"
+                disabled={isCreating || !username.trim()}
+                className="flex-1 h-12 text-lg group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 disabled:opacity-50"
               >
-                <Code className="mr-2 h-5 w-5 group-hover: transition-transform duration-200" />
-                Create New Room
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
+                {isCreating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Creating Room... wait few seconds
+                  </>
+                ) : (
+                  <>
+                    <Code className="mr-2 h-5 w-5 group-hover: transition-transform duration-200" />
+                    Create New Room
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
+                  </>
+                )}
               </Button>
               
               <Button
