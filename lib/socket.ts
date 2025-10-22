@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client'
+// Note: Toast notifications will be handled by components using the custom toast hook
 
 let socket: Socket | null = null
 

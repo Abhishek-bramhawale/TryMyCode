@@ -4,17 +4,19 @@ import { useState} from "react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/store/use-store"
 import { Play, Loader2 } from "lucide-react"
-import toast from "react-hot-toast"
+import { useToast } from "@/components/toast"
 
 export function RunCodeButton(){
   const { currentRoom, updateRoomOutput, setRoomRunning } = useStore()
   const [isRunning, setIsRunning] = useState(false)
+  const { addToast } = useToast()
 
   const handleRunCode = async() =>{
     if (!currentRoom) return
 
     setIsRunning(true)
     setRoomRunning(true)
+    addToast("Executing your code...", "info")
 
     try {
       const response = await fetch('/api/execute',{
@@ -35,15 +37,15 @@ export function RunCodeButton(){
 
       if (result.error){
         updateRoomOutput(`Error: ${result.error}`)
-        toast.error("Code execution failed")
+        addToast(`Execution failed: ${result.error}`, "error")
       } else {
         updateRoomOutput(result.output)
-        toast.success("Code executed successfully!")
+        addToast("Code executed successfully! 🎉", "success")
       }
     } catch (error){
       console.error('Code execution error:', error)
       updateRoomOutput("Error: Failed to execute code. Please check your code and try again.")
-      toast.error("Failed to execute code")
+      addToast("Failed to execute code. Please try again.", "error")
     } finally {
       setIsRunning(false)
       setRoomRunning(false)

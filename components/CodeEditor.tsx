@@ -5,6 +5,7 @@ import Editor from "@monaco-editor/react"
 import { useStore } from "@/store/use-store"
 import { DEFAULT_CODE_SAMPLES } from "@/lib/constants"
 import { emitCodeChange, emitUserTyping,initializeSocket } from "@/lib/socket"
+import { useToast } from "@/components/toast"
 
 export function CodeEditor(){
   const{ 
@@ -19,6 +20,7 @@ export function CodeEditor(){
     isConnected,
     setIsConnected 
   } = useStore()
+  const { addToast } = useToast()
   const editorRef = useRef<any>(null)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const emitDebounceRef = useRef<NodeJS.Timeout | null>(null)
@@ -72,11 +74,18 @@ export function CodeEditor(){
       socket.on('user-joined',({ user: newUser }) =>{
         console.log('User joined:', newUser)
         addUserToRoom(newUser)
+        if (newUser.id !== user?.id) {
+          addToast(`${newUser.name} joined the room!`, "success")
+        }
       })
 
       socket.on('user-left', ({ userId }) =>{
         console.log('User left:', userId)
+        const leavingUser = currentRoom?.users.find(u => u.id === userId)
         removeUserFromRoom(userId)
+        if (leavingUser && leavingUser.id !== user?.id) {
+          addToast(`${leavingUser.name} left the room`, "info")
+        }
       })
 
       socket.on('user-typing', ({ userId, isTyping })=>{

@@ -8,7 +8,7 @@ import { useStore } from "@/store/use-store"
 import { USER_COLORS } from "@/lib/constants"
 import { generateUserId } from "@/lib/utils"
 import { ArrowLeft, Users, ArrowRight, Loader2 } from "lucide-react"
-import toast from "react-hot-toast"
+import { useToast } from "@/components/toast"
 import Link from "next/link"
 
 export default function JoinPage(){
@@ -18,6 +18,7 @@ export default function JoinPage(){
   const [showUsernameInput, setShowUsernameInput] = useState(false)
   const router = useRouter()
   const { user, setUser, setCurrentRoom, addUserToRoom } = useStore()
+  const { addToast } = useToast()
 
   useEffect(() =>{
     if (user) {
@@ -30,16 +31,17 @@ export default function JoinPage(){
 
   const handleJoinRoom = async () =>{
     if (!roomId.trim()) {
-      toast.error("Please enter a room ID")
+      addToast("Please enter a room ID", "error")
       return
     }
 
     if (showUsernameInput && !username.trim()){
-      toast.error("Please enter your name")
+      addToast("Please enter your name", "error")
       return
     }
 
     setIsJoining(true)
+    addToast("Joining room...", "info")
 
     try{
       if(!user){
@@ -50,9 +52,11 @@ export default function JoinPage(){
           color: randomColor,
         }
         setUser(newUser)
+        addToast(`Welcome ${username.trim()}!`, "success")
       } else if (user.name !== username.trim()){
         const updatedUser = { ...user, name: username.trim()}
         setUser(updatedUser)
+        addToast(`Name updated to ${username.trim()}`, "success")
       }
 
       const normalizedRoomId = roomId.trim().toUpperCase()
@@ -68,9 +72,9 @@ export default function JoinPage(){
       
       if (!response.ok){
         if (response.status === 404) {
-          toast.error("Room not found. Please check the room ID.")
+          addToast("Room not found. Please check the room ID.", "error")
         } else {
-          toast.error("Failed to join room")
+          addToast("Failed to join room. Please try again.", "error")
         }
         return
       }
@@ -79,13 +83,16 @@ export default function JoinPage(){
    
       setCurrentRoom(room)
       
+      addToast(`Successfully joined room ${normalizedRoomId}!`, "success")
+      addToast("Redirecting to room...", "info")
+      
       router.push(`/room/${normalizedRoomId}`)
     } catch (error) {
       console.error('Join room error:', error)
       if (error instanceof Error && error.name === 'AbortError'){
-        toast.error("Request timed out. Please try again.")
+        addToast("Request timed out. Please try again.", "error")
       } else {
-        toast.error("Failed to join room")
+        addToast("Failed to join room. Please check your connection.", "error")
       }
     } finally {
       setIsJoining(false)
@@ -94,7 +101,7 @@ export default function JoinPage(){
 
   const handleUsernameSubmit = () =>{
     if (!username.trim()) {
-      toast.error("Please enter your name")
+      addToast("Please enter your name", "error")
       return
     }
     

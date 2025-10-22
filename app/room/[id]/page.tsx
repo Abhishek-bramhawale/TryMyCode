@@ -13,7 +13,7 @@ import {InputOutputPanel}  from "@/components/ip-op-panel"
 // import { VoiceControls } from "@/components/voice-controls"
 import { Button } from "@/components/ui/button"
 import { Copy, Users, Code, Play, LogOut } from "lucide-react"
-import toast from "react-hot-toast"
+import { useToast } from "@/components/toast"
 import { Header } from "@/components/header"
 
 export default function RoomPage(){
@@ -23,6 +23,7 @@ export default function RoomPage(){
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
+  const { addToast } = useToast()
 
   useEffect(() =>{
     const initializeRoom = async () => {
@@ -120,9 +121,9 @@ export default function RoomPage(){
     const roomId = String(params.id)
     try{
       await copyToClipboard(roomId)
-      toast.success("Room ID copied to clipboard!")
+      addToast("Room ID copied to clipboard!", "success")
     }catch (error){
-      toast.error("Failed to copy room ID")
+      addToast("Failed to copy room ID", "error")
     }
   }
 
@@ -150,11 +151,11 @@ export default function RoomPage(){
       })
 
       if (response.ok) {
-        toast.success("Left room successfully")
+        addToast("Left room successfully", "success")
       }
     } catch (error) {
       console.error('Leave room error:', error)
-      toast.error("Failed to leave room")
+      addToast("Failed to leave room", "error")
     } finally {
       leaveRoom()
       router.push("/")

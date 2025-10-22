@@ -8,7 +8,7 @@ import { useStore } from "@/store/use-store"
 import { generateUserId, copyToClipboard } from "@/lib/utils"
 import { USER_COLORS } from "@/lib/constants"
 import { Code, Users, Copy, ArrowRight } from "lucide-react"
-import toast from "react-hot-toast"
+import { useToast } from "@/components/toast"
 import {Header} from "@/components/header"
 
 
@@ -17,6 +17,7 @@ export default function Home() {
   const [isCreating, setIsCreating] = useState(false);
   const router = useRouter();
   const { user, setUser, setCurrentRoom } = useStore();
+  const { addToast } = useToast();
 
     useEffect(()=>{
     if (user){
@@ -26,13 +27,12 @@ export default function Home() {
 
   const handleCreateRoom =async() =>{
     if (!username.trim()) {
-      toast.error("Please enter your name")
+      addToast("Please enter your name", "error")
       return
     }
 
     setIsCreating(true)
-
-
+    addToast("Creating your coding room...", "info")
 
  try {
       if (!user) {
@@ -43,11 +43,14 @@ export default function Home() {
           color: randomColor,
         }
         setUser(newUser)
+        addToast(`Welcome ${username.trim()}!`, "success")
       } else if (user.name !== username.trim()){
         const updatedUser = { ...user, name: username.trim()}
         setUser(updatedUser)
+        addToast(`Name updated to ${username.trim()}`, "success")
       }
-const response = await fetch('/api/rooms',{
+
+      const response = await fetch('/api/rooms',{
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -55,16 +58,21 @@ const response = await fetch('/api/rooms',{
           userName: username.trim(),
           userColor: user?.color ||USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
         })
-
-      
       })
-        const { room } = await response.json()
+
+      if (!response.ok) {
+        throw new Error('Failed to create room')
+      }
+
+      const { room } = await response.json()
       setCurrentRoom(room)
+
+      addToast(`Room ${room.id} created successfully!`, "success")
 
       router.push(`/room/${room.id}`)
 }catch (error){
       console.error('Create room error:', error)
-      toast.error("Failed to create room")
+      addToast("Failed to create room. Please try again.", "error")
     } finally{
       setIsCreating(false)
     }
@@ -72,7 +80,7 @@ const response = await fetch('/api/rooms',{
 
   const handleJoinRoom = () => {
     if (!username.trim()) {
-      toast.error("Please enter your name")
+      addToast("Please enter your name first", "error")
       return
     }
 
@@ -84,12 +92,15 @@ const response = await fetch('/api/rooms',{
         color: randomColor,
       }
       setUser(newUser)
+      addToast(`Welcome ${username.trim()}!`, "success")
     } else if (user.name !== username.trim()) {
       // Update user name if changed
       const updatedUser = { ...user, name: username.trim() }
       setUser(updatedUser)
+      addToast(`Name updated to ${username.trim()}`, "success")
     }
 
+    addToast("Redirecting to join room...", "info")
     router.push("/join")
   }
 

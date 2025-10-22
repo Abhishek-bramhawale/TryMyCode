@@ -5,6 +5,7 @@ import "./globals.css";
 import {Header} from '@/components/header'
 import { ThemeProvider } from '@/components/theme-provider'
 import { HydrationProvider } from '@/components/hydration-provider'
+import { ToastProvider } from '@/components/toast'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -33,9 +34,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <HydrationProvider>
-            <div className="min-h-screen bg-background">
-              {children}
-            </div>
+            <ToastProvider>
+              <div className="min-h-screen bg-background">
+                {children}
+              </div>
+            </ToastProvider>
           </HydrationProvider>
         </ThemeProvider>
       </body>
