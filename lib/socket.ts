@@ -7,7 +7,11 @@ export function initializeSocket() {
   if (!socket) {
     socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001', {
       autoConnect: false,
-      transports: ['websocket', 'polling']
+      transports: ['websocket', 'polling'],
+      timeout: 5000,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
     })
 
     socket.on('connect', () => {
@@ -20,6 +24,10 @@ export function initializeSocket() {
 
     socket.on('connect_error', (error) => {
       console.error('WebSocket connection error:', error)
+    })
+
+    socket.on('error', (error) => {
+      console.error('WebSocket error:', error)
     })
   }
 
@@ -34,8 +42,10 @@ export function getSocket(): Socket | null {
  export  function connectToRoom ( roomId:string , user : {id:string; name:string , color:string} ) {
    const socket=   getSocket()
    if(socket){
-     socket.connect( )
-       socket.emit('join-room' ,{roomId ,user} )
+     if (!socket.connected) {
+       socket.connect()
+     }
+     socket.emit('join-room' ,{roomId ,user} )
    } 
 }
 

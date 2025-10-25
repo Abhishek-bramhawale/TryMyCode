@@ -34,6 +34,10 @@ export function CodeEditor(){
       const socket = initializeSocket()
       socketRef.current = socket
       
+      if (!socket.connected) {
+        socket.connect()
+      }
+      
       socket.on('connect', () =>{
         setIsConnected(true)
         socket.emit('join-room', { roomId: currentRoom.id, user })
@@ -52,13 +56,13 @@ export function CodeEditor(){
             
             const timeSinceLastInput = now - lastSyncTimeRef.current
             
-            const isSignificantChange = 
-              Math.abs(currentValue.length - code.length) > 5 || 
-              currentValue.length < 10 || 
-              timeSinceLastInput > 2000 || 
-              !currentValue.includes(code.substring(0, Math.min(20, Math.min(currentValue.length, code.length))))
+
+            const shouldSync = 
+              (timeSinceLastInput > 3000 && Math.abs(currentValue.length - code.length) > 20) ||
+              (currentValue.length < 5 && code.length > 10) ||
+              (timeSinceLastInput > 5000)
             
-            if (isSignificantChange) {
+            if (shouldSync) {
               model.setValue(code)
               updateRoomCode(code)
               lastSyncTimeRef.current = now
@@ -162,12 +166,13 @@ export function CodeEditor(){
       if (emitDebounceRef.current){
         clearTimeout(emitDebounceRef.current)
       }
+      
       emitDebounceRef.current = setTimeout(() =>{
         emitCodeChange(currentRoom.id, value)
         setTimeout(() => {
           isUserTypingRef.current = false
-        }, 200)
-      }, 500)  
+        }, 1000) 
+      }, 300) 
 
     if (user) {
         emitUserTyping(currentRoom.id, user.id, true)
@@ -176,7 +181,7 @@ export function CodeEditor(){
         }
         typingTimeoutRef.current = setTimeout(() => {
           emitUserTyping(currentRoom.id, user.id, false)
-        }, 1000) 
+        }, 1500) 
       }
     }
   }, [currentRoom, user, updateRoomCode])
@@ -206,6 +211,18 @@ export function CodeEditor(){
           acceptSuggestionOnEnter: "on",
           tabCompletion: "on",
           wordBasedSuggestions: "allDocuments",
+          renderWhitespace: "none",
+          renderControlCharacters: false,
+          renderLineHighlight: "none",
+          cursorBlinking: "smooth",
+          cursorSmoothCaretAnimation: "on",
+          smoothScrolling: true,
+          folding: false,
+          bracketPairColorization: { enabled: false },
+          guides: { bracketPairs: false },
+          quickSuggestions: false,
+          parameterHints: { enabled: false },
+          hover: { enabled: false }
         }}
       />
     </div>

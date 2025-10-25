@@ -55,18 +55,34 @@ export const useStore = create<AppState>()(
       setUser: (user) => set({ user }),
       currentRoom: null,
       setCurrentRoom: (room) => set({ currentRoom: room }),
-      updateRoomCode: (code) => set((state) => ({
-        currentRoom: state.currentRoom ? { ...state.currentRoom, code } : null
-      })),
-      updateRoomLanguage: (language) => set((state) => ({
-        currentRoom: state.currentRoom ? { ...state.currentRoom, language } : null
-      })),
-      updateRoomInput: (input) => set((state) => ({
-        currentRoom: state.currentRoom ? { ...state.currentRoom, input } : null
-      })),
-      updateRoomOutput: (output) => set((state) => ({
-        currentRoom: state.currentRoom ? { ...state.currentRoom, output } : null
-      })),
+      updateRoomCode: (code) => set((state) => {
+        if (!state.currentRoom) return state
+        if (state.currentRoom.code === code) return state
+        return {
+          currentRoom: { ...state.currentRoom, code }
+        }
+      }),
+      updateRoomLanguage: (language) => set((state) => {
+        if (!state.currentRoom) return state
+        if (state.currentRoom.language === language) return state
+        return {
+          currentRoom: { ...state.currentRoom, language }
+        }
+      }),
+      updateRoomInput: (input) => set((state) => {
+        if (!state.currentRoom) return state
+        if (state.currentRoom.input === input) return state
+        return {
+          currentRoom: { ...state.currentRoom, input }
+        }
+      }),
+      updateRoomOutput: (output) => set((state) => {
+        if (!state.currentRoom) return state
+        if (state.currentRoom.output === output) return state
+        return {
+          currentRoom: { ...state.currentRoom, output }
+        }
+      }),
       setRoomRunning: (isRunning) => set((state) => ({
         currentRoom: state.currentRoom ? { ...state.currentRoom, isRunning } : null
       })),

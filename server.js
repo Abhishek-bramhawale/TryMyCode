@@ -22,6 +22,12 @@ const userSockets = new Map()
     console.log('User connected:', socket.id)
 
     socket.on('join-room', ({ roomId, user }) => {
+      if (!roomId || !user || !user.id || !user.name) {
+        console.error('Invalid join-room data:', { roomId, user })
+        socket.emit('error', { message: 'Invalid room or user data' })
+        return
+      }
+
       console.log(`User ${user.name} joining room ${roomId}`)
       
       socket.join(roomId)

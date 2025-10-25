@@ -25,6 +25,12 @@ export default function Home() {
     }
   }, [user])
 
+  useEffect(() => {
+    return () => {
+      setIsCreating(false)
+    }
+  }, [])
+
   const handleCreateRoom =async() =>{
     if (!username.trim()) {
       addToast("Please enter your name", "error")
@@ -73,8 +79,7 @@ export default function Home() {
 }catch (error){
       console.error('Create room error:', error)
       addToast("Failed to create room. Please try again.", "error")
-    } finally{
-      setIsCreating(false)
+      setIsCreating(false) 
     }
   }
 
