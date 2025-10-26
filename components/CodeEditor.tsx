@@ -26,11 +26,13 @@ export function CodeEditor(){
   const emitDebounceRef = useRef<NodeJS.Timeout | null>(null)
   const socketRef = useRef<any>(null)
   const isUserTypingRef = useRef<boolean>(false)
-  const lastUserInputRef = useRef<string>('')
   const lastSyncTimeRef = useRef<number>(0)
+  const previousLanguageRef = useRef<string | null>(null)
 
    useEffect(() =>{
     if (currentRoom && user){
+      previousLanguageRef.current = currentRoom.language
+      
       const socket = initializeSocket()
       socketRef.current = socket
       
@@ -73,6 +75,16 @@ export function CodeEditor(){
 
       socket.on('language-update', ({ language }) =>{
         updateRoomLanguage(language)
+        const sampleCode = DEFAULT_CODE_SAMPLES[language as keyof typeof DEFAULT_CODE_SAMPLES]
+        if (sampleCode && editorRef.current && currentRoom) {
+          const model = editorRef.current.getModel()
+          if (model) {
+            model.setValue(sampleCode)
+            updateRoomCode(sampleCode)
+            previousLanguageRef.current = language
+            emitCodeChange(currentRoom.id, sampleCode)
+          }
+        }
       })
 
       socket.on('user-joined',({ user: newUser }) =>{
@@ -121,11 +133,10 @@ export function CodeEditor(){
   useEffect(() =>{
     if (currentRoom && editorRef.current){
       const model = editorRef.current.getModel()
-      if (model) {
-        const currentValue = model.getValue()
+      if (model && currentRoom.language !== previousLanguageRef.current) {
         const sampleCode = DEFAULT_CODE_SAMPLES[currentRoom.language as keyof typeof DEFAULT_CODE_SAMPLES]
         
-        if (currentValue === "" || currentValue === DEFAULT_CODE_SAMPLES.javascript) {
+        if (sampleCode) {
           const position = editorRef.current.getPosition()
           model.setValue(sampleCode)
           updateRoomCode(sampleCode)
@@ -133,10 +144,11 @@ export function CodeEditor(){
           if (position) {
             editorRef.current.setPosition(position)
           }
+          previousLanguageRef.current = currentRoom.language
         }
       }
     }
-  }, [currentRoom?.language, updateRoomCode])
+  }, [currentRoom?.language, updateRoomCode, currentRoom?.id])
 
   useEffect(() => {
     if (!currentRoom && socketRef.current) {
@@ -158,7 +170,6 @@ export function CodeEditor(){
   const handleEditorChange = useCallback((value: string | undefined) =>{
     if (value !== undefined && currentRoom) {
       isUserTypingRef.current = true
-      lastUserInputRef.current = value
       lastSyncTimeRef.current = Date.now()
       
       updateRoomCode(value)

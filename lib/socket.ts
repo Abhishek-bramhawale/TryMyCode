@@ -39,25 +39,6 @@ export function getSocket(): Socket | null {
 }
 
 
- export  function connectToRoom ( roomId:string , user : {id:string; name:string , color:string} ) {
-   const socket=   getSocket()
-   if(socket){
-     if (!socket.connected) {
-       socket.connect()
-     }
-     socket.emit('join-room' ,{roomId ,user} )
-   } 
-}
-
-
-export   function disconnectFromRoom( ){
- const socket =getSocket()
- if ( socket){
-   socket.disconnect()
- } 
-}
-
-
  export function emitCodeChange(roomId:string ,code:string){
    const socket= getSocket( ) 
    if(socket &&socket.connected ){

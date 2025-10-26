@@ -90,9 +90,44 @@ A modern, realtime collaborative coding platform built with Next.js, TypeScript,
 
 
 
+## API Endpoints
+
+### `/api/rooms` - Room management API for creating and managing rooms.
+
+- **POST** - Create a new room
+  - Creates a new coding room 
+  - Body: `{ userId, userName, userColor, roomIdOverride? }`
+  - Returns: `{ room }`
+
+- **GET** - Get room details
+  - Retrieves existing room information
+  - Query: `?id=ROOM_ID`
+  - Returns: `{ room }`
+
+- **PUT** - Update room properties
+  - Updates room data (code, language, input, output)
+  - Body: `{ roomId, ...updates }`
+  - Returns: `{ room }`
+
+- **PATCH** - Manage room users
+  - Add or remove users from a room
+  - Body: `{ roomId, action: 'add-user' | 'remove-user', user }`
+  - Returns: `{ room }`
+
+### `/api/execute`
+
+Code execution API with Judge0 integration.
+
+- **POST** - Execute code
+  - Runs code in any supported language
+  - Uses async polling for reliable execution
+  - Supports custom input (stdin)
+  - Falls back to mock execution if API keys aren't configured
+  - Body: `{ sourceCode, language, stdin? }`
+  - Returns: `{ output, error }` - Detailed output with stdout and stderr
+
 ## Links
 
 - [Monaco Editor](https://microsoft.github.io/monaco-editor/) - Code editor
 - [Judge0 API](https://judge0.com/) - Code execution
 - [Socket.IO](https://socket.io/) - Real-time communication
-

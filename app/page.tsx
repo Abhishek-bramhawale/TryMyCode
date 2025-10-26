@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/store/use-store"
-import { generateUserId, copyToClipboard } from "@/lib/utils"
+import { generateUserId } from "@/lib/utils"
 import { USER_COLORS } from "@/lib/constants"
-import { Code, Users, Copy, ArrowRight } from "lucide-react"
+import { Code, Users, ArrowRight } from "lucide-react"
 import { useToast } from "@/components/toast"
 import {Header} from "@/components/header"
 
@@ -180,7 +180,7 @@ return (
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-card border border-gray-200 rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(59,130,246,0.5)] transition-shadow duration-300">
+            <div className="bg-card border border-gray-200 rounded-lg p-6 hover:shadow-[blue-500] transition-shadow duration-300">
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-blue-500/10 rounded-full">
                   <Code className="h-6 w-6 text-blue-500" />
