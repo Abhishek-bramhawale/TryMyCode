@@ -17,8 +17,8 @@ export function Header() {
   }
 
   return(
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-16 items-center justify-between px-4 md:px-10 w-full">
         <div className="flex items-center space-x-4">
           <Link href="/" className="flex items-center space-x-2">
             <Code className="h-6 w-6" />
@@ -62,7 +62,7 @@ export function Header() {
               onClick={() => router.push("/join")}
               className="flex items-center space-x-2 group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80"
             >
-              <Users className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+              <Users className="h-4 w-4 group-hover:scale-110 transition-transform duration-200 mr-2" />
               <span className="group-hover:scale-105 transition-transform duration-200">Join Room</span>
             </Button>
           </div>
