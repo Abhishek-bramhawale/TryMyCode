@@ -1,225 +1,133 @@
 'use client'
 
-import { useState , useEffect} from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useStore } from "@/store/use-store"
-import { generateUserId } from "@/lib/utils"
-import { USER_COLORS } from "@/lib/constants"
-import { Code, Users, ArrowRight } from "lucide-react"
-import { useToast } from "@/components/toast"
-import {Header} from "@/components/header"
+import { Header } from "@/components/header"
+import { Code, Users, Zap, Globe, ArrowRight } from "lucide-react"
 
+export default function LandingPage() {
+  const router = useRouter()
 
-export default function Home() {
-  const [username, setUsername] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
-  const router = useRouter();
-  const { user, setUser, setCurrentRoom } = useStore();
-  const { addToast } = useToast();
-
-    useEffect(()=>{
-    if (user){
-      setUsername(user.name)
-    }
-  }, [user])
-
-  useEffect(() => {
-    return () => {
-      setIsCreating(false)
-    }
-  }, [])
-
-  const handleCreateRoom =async() =>{
-    if (!username.trim()) {
-      addToast("Please enter your name", "error")
-      return
-    }
-
-    setIsCreating(true)
-    addToast("Creating your coding room...", "info")
-
- try {
-      if (!user) {
-        const randomColor = USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
-        const newUser = {
-          id: generateUserId(),
-          name: username.trim(),
-          color: randomColor,
-        }
-        setUser(newUser)
-        addToast(`Welcome ${username.trim()}!`, "success")
-      } else if (user.name !== username.trim()){
-        const updatedUser = { ...user, name: username.trim()}
-        setUser(updatedUser)
-        addToast(`Name updated to ${username.trim()}`, "success")
-      }
-
-      const response = await fetch('/api/rooms',{
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          userId: user?.id || generateUserId(),
-          userName: username.trim(),
-          userColor: user?.color ||USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to create room')
-      }
-
-      const { room } = await response.json()
-      setCurrentRoom(room)
-
-      addToast(`Room ${room.id} created successfully!`, "success")
-
-      router.push(`/room/${room.id}`)
-}catch (error){
-      console.error('Create room error:', error)
-      addToast("Failed to create room. Please try again.", "error")
-      setIsCreating(false) 
-    }
+  const handleGetStarted = () => {
+    router.push('/home')
   }
 
-  const handleJoinRoom = () => {
-    if (!username.trim()) {
-      addToast("Please enter your name first", "error")
-      return
-    }
-
-    if (!user) {
-      const randomColor = USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
-      const newUser = {
-        id: generateUserId(),
-        name: username.trim(),
-        color: randomColor,
-      }
-      setUser(newUser)
-      addToast(`Welcome ${username.trim()}!`, "success")
-    } else if (user.name !== username.trim()) {
-      // Update user name if changed
-      const updatedUser = { ...user, name: username.trim() }
-      setUser(updatedUser)
-      addToast(`Name updated to ${username.trim()}`, "success")
-    }
-
-    addToast("Redirecting to join room...", "info")
-    router.push("/join")
-  }
-
-
-return (
+  return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
       <Header />
+      
       <div className="container mx-auto px-4 py-16">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 bg-primary/10 rounded-full">
-                <Code className="h-12 w-12 text-primary" />
-              </div>
+        <div className="max-w-4xl mx-auto text-center mb-20">
+          <div className="flex justify-center mb-8">
+            <div className="p-6 bg-primary/10 rounded-full animate-pulse">
+              <Code className="h-16 w-16 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold mb-4">
-              Welcome to{" "}
-              <span className="text-primary">TryMyCode</span>
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              Realtime collaborative code editing with live compilation and interpretation
+          </div>
+          
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            TryMyCode
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-2xl mx-auto">
+            Realtime collaborative code editing platform
+          </p>
+          
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Write, edit, and execute code together with your team in the same workspace. See changes as they happen, run code instantly, and collaborate seamlessly.
+          </p>
+          
+          <Button
+            onClick={handleGetStarted}
+            size="lg"
+            className="text-lg px-8 py-6 h-auto group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:shadow-lg hover:shadow-primary/25"
+          >
+            Get Started
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
+          </Button>
+        </div>
+
+        <div className="max-w-4xl mx-auto mb-20">
+          <div className="bg-card border rounded-lg p-8 md:p-12 shadow-lg">
+            <h2 className="text-3xl font-bold mb-6 text-center">What is TryMyCode?</h2>
+            <p className="text-lg text-muted-foreground text-center leading-relaxed">
+              TryMyCode is a realtime collaborative code editing platform that allows multiple developers to write, edit, and execute code together in the same workspace. Built for teams who want to code together, share ideas instantly, and test their code in realtime.
             </p>
           </div>
+        </div>
 
-          <div className="bg-card border rounded-lg p-8 mb-8">
-            <h2 className="text-2xl font-semibold mb-6">Get Started</h2>
-            
-            <div className="space-y-4 mb-6">
-              <Input
-                placeholder="Enter your name"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="text-center text-lg"
-                disabled={isCreating}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !isCreating) {
-                    handleCreateRoom()
-                  }
-                }}
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                onClick={handleCreateRoom}
-                disabled={isCreating || !username.trim()}
-                className="flex-1 h-12 text-lg group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 disabled:opacity-50"
-              >
-                {isCreating ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Creating Room... wait few seconds
-                  </>
-                ) : (
-                  <>
-                    <Code className="mr-2 h-5 w-5 group-hover: transition-transform duration-200" />
-                    Create New Room
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-                  </>
-                )}
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="flex-1 h-12 text-lg group hover:bg-gradient-to-r hover:from-accent hover:to-accent/80"
-                onClick={handleJoinRoom}
-              >
-                <Users className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
-                Join Existing Room
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-card border border-gray-200 rounded-lg p-6 hover:shadow-[blue-500] transition-shadow duration-300">
+        <div className="max-w-6xl mx-auto mb-20">
+          <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-card border rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(59,130,246,0.5)] transition-shadow duration-300 hover:scale-105 transform">
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-blue-500/10 rounded-full">
-                  <Code className="h-6 w-6 text-blue-500" />
+                  <Users className="h-8 w-8 text-blue-500" />
                 </div>
               </div>
-              <h3 className="font-semibold mb-2">Real time Editing</h3>
-              <p className="text-sm text-muted-foreground">
-                Collaborate with others in realtime with live code synchronization
+              <h3 className="font-semibold text-lg mb-3 text-center">Realtime Collaboration</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                Work together with your team members in the same code editor. See changes as they happen, with live synchronization of code across all connected users.
               </p>
             </div>
 
-            <div className="bg-card border border-gray-200 rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(16,185,129,0.5)] transition-shadow duration-300">
-
+            <div className="bg-card border rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(16,185,129,0.5)] transition-shadow duration-300 hover:scale-105 transform">
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-green-500/10 rounded-full">
-                  <Code className="h-6 w-6 text-green-500" />
+                  <Zap className="h-8 w-8 text-green-500" />
                 </div>
               </div>
-              <h3 className="font-semibold mb-2">Live Compilation</h3>
-              <p className="text-sm text-muted-foreground">
-                Run your code instantly with support for multiple programming languages
+              <h3 className="font-semibold text-lg mb-3 text-center">Live Code Execution</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                Run your code instantly with support for multiple programming languages. Get immediate feedback on your code execution results without leaving the editor.
               </p>
             </div>
 
-            <div className="bg-card border border-gray-200 rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(168,85,247,0.5)] transition-shadow duration-300">
-
+            <div className="bg-card border rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(168,85,247,0.5)] transition-shadow duration-300 hover:scale-105 transform">
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-purple-500/10 rounded-full">
-                  <Users className="h-6 w-6 text-purple-500" />
+                  <Globe className="h-8 w-8 text-purple-500" />
                 </div>
               </div>
-              <h3 className="font-semibold mb-2">User Presence</h3>
-              <p className="text-sm text-muted-foreground">
-                See who's online and what they're working on in realtime libe
+              <h3 className="font-semibold text-lg mb-3 text-center">User Presence</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                See who is currently online in your coding room and what they are working on. Know when your teammates are active and collaborating with you.
               </p>
+            </div>
+
+            <div className="bg-card border rounded-lg p-6 hover:shadow-[0_0_0_3px_rgba(251,146,60,0.5)] transition-shadow duration-300 hover:scale-105 transform">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-orange-500/10 rounded-full">
+                  <Code className="h-8 w-8 text-orange-500" />
+                </div>
+              </div>
+              <h3 className="font-semibold text-lg mb-3 text-center">Create or Join Rooms</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                Create a new coding room to start a fresh collaboration session, or join an existing room using a room ID to collaborate with others.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto mb-20">
+          <div className="bg-card border rounded-lg p-8 md:p-12 shadow-lg">
+            <h2 className="text-3xl font-bold mb-6 text-center">How to Get Started</h2>
+            <p className="text-lg text-muted-foreground text-center leading-relaxed mb-8">
+              Getting started with TryMyCode is simple. Click the button below to begin your collaborative coding journey. You can create a new coding room or join an existing one to start collaborating with your team instantly.
+            </p>
+            <div className="flex justify-center">
+              <Button
+                onClick={handleGetStarted}
+                size="lg"
+                className="text-lg px-8 py-6 h-auto group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:shadow-lg hover:shadow-primary/25"
+              >
+                Get Started
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
+              </Button>
             </div>
           </div>
         </div>
       </div>
     </div>
   )
-} 
+}

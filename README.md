@@ -54,14 +54,14 @@ A modern, realtime collaborative coding platform built with Next.js, TypeScript,
    npm install
    ```
 
-3. **Start the development server**
+3. **Start the development server** (frontend)
    ```bash
    npm run dev
    ```
 
 4. **Start the WebSocket server** (in a separate terminal)
    ```bash
-   npm run dev
+   node server.js
    ```
 
 5. **Open your browser**
