@@ -51,7 +51,7 @@ export function Header() {
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/home")}
               className="flex items-center space-x-2 group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80"
             >
               <Code className="h-4 w-4 group-hover: transition-transform duration-200" />

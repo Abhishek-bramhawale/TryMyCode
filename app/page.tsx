@@ -39,7 +39,7 @@ export default function LandingPage() {
           <Button
             onClick={handleGetStarted}
             size="lg"
-            className="text-lg px-8 py-6 h-auto group hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:shadow-lg hover:shadow-primary/25"
+            className="text-lg px-8 py-4 h-auto group bg-blue-600 text-white font-semibold hover:bg-blue-700 hover:shadow-lg shadow-md transition-all duration-300 transform hover:scale-105"
           >
             Get Started
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
@@ -109,7 +109,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto mb-20">
+        {/* <div className="max-w-4xl mx-auto mb-20">
           <div className="bg-card border rounded-lg p-8 md:p-12 shadow-lg">
             <h2 className="text-3xl font-bold mb-6 text-center">How to Get Started</h2>
             <p className="text-lg text-muted-foreground text-center leading-relaxed mb-8">
@@ -126,7 +126,7 @@ export default function LandingPage() {
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )
